@@ -1,5 +1,6 @@
 <?php
 
 return array (
-  'failed' => '',
+  'failed' => 'échoué',
+  'throttle' => 'accélérateur',
 );
