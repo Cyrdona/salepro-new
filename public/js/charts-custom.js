@@ -123,7 +123,7 @@ $(document).ready(function () {
         var saleChart = new Chart(SALECHART, {
             type: 'bar',
             data: {
-                labels: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+                labels: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
                 datasets: [
                     {
                         label: label1,
@@ -239,7 +239,7 @@ $(document).ready(function () {
                             brandPrimary
                         ],
                         borderWidth: 1,
-                        data: [ 
+                        data: [
                                 sold_qty[0], sold_qty[1],
                                 sold_qty[2], 0],
                     }
@@ -284,7 +284,7 @@ $(document).ready(function () {
                             brandPrimaryRgba,
                             "rgba(255, 137, 82, 0.8)",
                             "rgb(133, 140, 133, 0.8)",
-                            
+
                         ],
                     }]
             },
@@ -320,20 +320,20 @@ $(document).ready(function () {
                             brandPrimary,
                             "#ff8952",
                             "#858c85",
-                            
+
                         ],
                         hoverBackgroundColor: [
                             brandPrimaryRgba,
                             "rgba(255, 137, 82, 0.8)",
                             "rgb(133, 140, 133, 0.8)",
-                            
+
                         ],
                        hoverBorderWidth: [4, 4, 4],
                        hoverBorderColor: [
                             brandPrimaryRgba,
                             "rgba(255, 137, 82, 0.8)",
                             "rgb(133, 140, 133, 0.8)",
-                            
+
                         ],
                     }]
             }

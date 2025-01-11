@@ -9,6 +9,7 @@ return array (
   'Purchased Amount' => 'Montant acheté',
   'Recieved Amount' => 'Montant reçu',
   'Sold Amount' => 'Montant vendu',
+  'VAT Number' => 'Numéro de TVA',
   'records per page' => 'enreg par page',
   'sale amount' => 'montant des ventes',
 );
