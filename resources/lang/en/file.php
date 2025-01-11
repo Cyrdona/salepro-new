@@ -1177,4 +1177,7 @@ return [
     "Update store" => "Mettre à jour le magasin",
     "Product added successfully" => "Produit ajouté avec succès",
     "Product updated successfully" => "Produit mis à jour avec succès",
+    'Stock Worth (Price/Cost)' => 'Valeur du stock (prix / coût)',
+    'Stock Worth (Price\\/Cost)' => 'Valeur des stocks (Prix/Coût)',
+    'Manufacturing' => 'Fabrication',
 ];
