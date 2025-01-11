@@ -295,7 +295,7 @@
 
           ?>
           @if($sale_add_permission_active)
-          <li class="nav-item"><a class="btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> POS</span></a></li>
+          <li class="nav-item"><a class="btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> PDV </span></a></li>
           @endif
           <li class="nav-item d-none d-lg-block"><a id="switch-theme" data-toggle="tooltip" title="{{trans('file.Switch Theme')}}"><i class="dripicons-brightness-max"></i></a></li>
           @if(config('database.connections.saleprosaas_landlord'))
@@ -409,7 +409,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-12">
-            <p>&copy; {{$general_setting->site_title}} | {{trans('file.Developed')}} {{trans('file.By')}} <span class="external">{{$general_setting->developed_by}}</span> | V {{env('VERSION')}}</p>
+            <p>&copy; {{$general_setting->site_title}} | {{trans('file.Developed')}} {{trans('file.By')}} <span class="external">{{$general_setting->developed_by}}</span></p>
           </div>
         </div>
       </div>
