@@ -635,7 +635,7 @@
                     @endif
                     <li id="payment-gateway-setting-menu"><a href="{{route('setting.gateway')}}">{{trans('file.Payment Gateways')}}</a></li>
                     @if($pos_setting_permission_active)
-                    <li id="pos-setting-menu"><a href="{{route('setting.pos')}}">POS {{trans('file.settings')}}</a></li>
+                    <li id="pos-setting-menu"><a href="{{route('setting.pos')}}">PDV {{trans('file.settings')}}</a></li>
                     @endif
                     @if($hrm_setting_permission_active)
                     <li id="hrm-setting-menu"><a href="{{route('setting.hrm')}}"> {{trans('file.HRM Setting')}}</a></li>
