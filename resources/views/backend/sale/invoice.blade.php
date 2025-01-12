@@ -97,10 +97,9 @@
             @if($general_setting->site_logo)
                 <img src="{{url('logo', $general_setting->site_logo)}}" height="200" width="200" style="margin:1px 0;">
             @endif
-
-            <h2>{{$lims_biller_data->company_name}}</h2>
-
-            <p>{{trans('file.Address')}}: {{$lims_warehouse_data->address}}
+            <h3>{{trans('file.name')}}: {{$lims_warehouse_data->name}}</h3>
+            <p>
+                <br>{{trans('file.Biller')}}: {{$lims_biller_data->name}}
                 <br>{{trans('file.Phone Number')}}: {{$lims_warehouse_data->phone}}
                 @if($general_setting->vat_registration_number)
                 <br>{{trans('file.VAT Number')}}: {{$general_setting->vat_registration_number}}
