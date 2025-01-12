@@ -1173,7 +1173,7 @@ return [
     "Warehouse name" => "Nom de l'entrepôt",
     "Store email" => "E-mail du magasin",
     "Add new store" => "Ajt un nouveau magasin",
-    "Update store" => "Mettre à jour le magasin",
+    "Update store" => "Maj le magasin",
     "Product added successfully" => "Produit ajouté avec succès",
     "Product updated successfully" => "Produit mis à jour avec succès",
     "Stock Worth (Price/Cost)" => "Val du stock (prix / coût)",
