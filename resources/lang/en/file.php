@@ -1183,6 +1183,7 @@ return [
     "Add Production" => "Ajt une Production",
     "Production Status" => "État de la prod",
     "Price" => "Prix",
+    "price" => "prix",
     "Total Tax" => "Total de l\'impôt",
     "Expired Date" => "Date d\'expiration",
     "Information on Label" => "Info sur l\'étiquette",
