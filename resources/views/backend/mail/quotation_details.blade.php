@@ -47,17 +47,17 @@
 							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 								<tr>
 									<td style="padding:0 0 36px 0;color:#153643;">
-										<h1>Quotation Details</h1>
-										<p><strong>Reference: </strong>{{$quotation_data['reference_no']}}</p>
-										<h3>Order Table</h3>
+										<h1>Détails du devis</h1>
+										<p><strong>Référence : </strong>{{$quotation_data['reference_no']}}</p>
+										<h3>Tableau de commande</h3>
 
 										<table style="border-collapse: collapse; width: 100%;">
 											<thead>
 												<th style="border: 1px solid #000; padding: 5px">#</th>
-												<th style="border: 1px solid #000; padding: 5px">Product</th>
-												<th style="border: 1px solid #000; padding: 5px">Qty</th>
-												<th style="border: 1px solid #000; padding: 5px">Unit Price</th>
-												<th style="border: 1px solid #000; padding: 5px">SubTotal</th>
+												<th style="border: 1px solid #000; padding: 5px">Produit</th>
+												<th style="border: 1px solid #000; padding: 5px">Quantité</th>
+												<th style="border: 1px solid #000; padding: 5px">Prix Unitaire</th>
+												<th style="border: 1px solid #000; padding: 5px">Sous-Total</th>
 											</thead>
 											<tbody>
 												@foreach($quotation_data['products'] as $key=>$product)
@@ -76,31 +76,31 @@
 													<td style="border: 1px solid #000; padding: 5px">{{$quotation_data['total_price']}}</td>
 												</tr>
 												<tr>
-													<td colspan="4" style="border: 1px solid #000; padding: 5px"><strong>Order Tax </strong> </td>
+													<td colspan="4" style="border: 1px solid #000; padding: 5px"><strong>Taxe de commande </strong> </td>
 													<td style="border: 1px solid #000; padding: 5px">{{$quotation_data['order_tax'].'('.$quotation_data['order_tax_rate'].'%)'}}</td>
 												</tr>
 												<tr>
-													<td colspan="4" style="border: 1px solid #000; padding: 5px"><strong>Order Discount </strong> </td>
+													<td colspan="4" style="border: 1px solid #000; padding: 5px"><strong>Remise sur commande </strong> </td>
 													<td style="border: 1px solid #000; padding: 5px">
 														@if($quotation_data['order_discount']){{$quotation_data['order_discount']}}
 														@else 0 @endif
 													</td>
 												</tr>
 												<tr>
-													<td colspan="4" style="border: 1px solid #000; padding: 5px"><strong>Shipping Cost</strong> </td>
+													<td colspan="4" style="border: 1px solid #000; padding: 5px"><strong>Frais de livraison</strong> </td>
 													<td style="border: 1px solid #000; padding: 5px">
 														@if($quotation_data['shipping_cost']){{$quotation_data['shipping_cost']}}
 														@else 0 @endif
 													</td>
 												</tr>
 												<tr>
-													<td colspan="4" style="border: 1px solid #000; padding: 5px"><strong>Grand Total</strong></td>
+													<td colspan="4" style="border: 1px solid #000; padding: 5px"><strong>Total général</strong></td>
 													<td style="border: 1px solid #000; padding: 5px">{{$quotation_data['grand_total']}}</td>
 												</tr>
 											</tbody>
 										</table>
 
-										<p>Thank You</p>
+										<p>Merci</p>
 
 									</td>
 								</tr>

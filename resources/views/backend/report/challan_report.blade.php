@@ -9,22 +9,22 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header mt-2">
-                <h3 class="text-center">Challan Report</h3>
+                <h3 class="text-center">Rapport sur les chèques</h3>
             </div>
             <form action="{{route('report.challan')}}" method="get">
                 <div class="row mb-3">
                     <div class="col-md-3 offset-md-1  mt-3">
                         <div class="form-group row">
-                            <label class="d-tc mt-2"><strong>Based On</strong> &nbsp;</label>
+                            <label class="d-tc mt-2"><strong>Basé sur</strong> &nbsp;</label>
                             <div class="d-tc">
                                 <div class="input-group">
                                     <select name="based_on" class="form-control">
                                         @if($based_on == 'created_at')
-                                            <option value="date">Created Date</option>
-                                            <option value="closing_date">Closing Date</option>
+                                            <option value="date">Date de création</option>
+                                            <option value="closing_date">Date de clôture</option>
                                         @else
-                                            <option value="created_at">Created Date</option>
-                                            <option selected value="closing_date">Closing Date</option>
+                                            <option value="created_at">Date de création</option>
+                                            <option selected value="closing_date">Date de clôture</option>
                                         @endif
                                     </select>
                                 </div>
