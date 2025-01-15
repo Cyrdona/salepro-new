@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -38,10 +38,6 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        .alert {
-            color: #e74c3c;
-            font-weight: bold;
-        }
         .empty-message {
             color: #777;
             font-style: italic;
@@ -54,22 +50,26 @@
     <p><strong>Total des paiements en espèces :</strong> {{ $reportData['total_cash'] }} </p>
     <p><strong>Total des dépenses :</strong> {{ $reportData['total_expenses'] }} </p>
 
-    <h2>Produits supprimés</h2>
-    @if(count($reportData['deleted_products']) > 0)
+    <h2>Produits créés aujourd'hui</h2>
+    @if(count($reportData['created_products']) > 0)
         <ul>
-            @foreach ($reportData['deleted_products'] as $product)
+            @foreach ($reportData['created_products'] as $product)
                 <li>{{ $product->name }} (Code: {{ $product->code }})</li>
             @endforeach
         </ul>
     @else
-        <p class="empty-message">Aucun produit supprimé aujourd'hui.</p>
+        <p class="empty-message">Aucun produit créé aujourd'hui.</p>
     @endif
 
-    <h2>Produits mis à jour</h2>
-    <ul>
-        @foreach ($reportData['updated_products'] as $product)
-            <li>{{ $product->name }} (Code: {{ $product->code }})</li>
-        @endforeach
-    </ul>
+    <h2>Produits mis à jour aujourd'hui</h2>
+    @if(count($reportData['updated_products']) > 0)
+        <ul>
+            @foreach ($reportData['updated_products'] as $product)
+                <li>{{ $product->name }} (Code: {{ $product->code }})</li>
+            @endforeach
+        </ul>
+    @else
+        <p class="empty-message">Aucun produit mis à jour aujourd'hui.</p>
+    @endif
 </body>
 </html>
