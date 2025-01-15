@@ -35,6 +35,6 @@ class DsoAlertMail extends Mailable
     public function build()
     {
         return $this->subject('Alerte Objectif de Vente Quotidien Non Atteint')
-                    ->view('email.dso_alert');  // Assurez-vous de créer cette vue
+                    ->view('backend.mail.dso_alert');  // Assurez-vous de créer cette vue
     }
 }
