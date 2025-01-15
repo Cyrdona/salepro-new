@@ -193,16 +193,23 @@
         }
     }
 
-$(".daterangepicker-field").daterangepicker({
+    $(".daterangepicker-field").daterangepicker({
+  locale: {
+    format: 'YYYY-MM-DD',
+    applyLabel: 'Appliquer',
+    cancelLabel: 'Annuler',
+    customRangeLabel: 'Plage personnalisée',
+    daysOfWeek: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
+    monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+  },
   callback: function(startDate, endDate, period){
     var start_date = startDate.format('YYYY-MM-DD');
     var end_date = endDate.format('YYYY-MM-DD');
-    var title = start_date + ' to ' + end_date;
+    var title = start_date + ' to ' + end_date; // Vous pouvez changer 'to' par 'à' si vous préférez
     $(this).val(title);
     $('input[name="start_date"]').val(start_date);
     $('input[name="end_date"]').val(end_date);
   }
 });
-
 </script>
 @endpush

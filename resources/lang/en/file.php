@@ -1184,6 +1184,7 @@ return [
     "Production Status" => "État de la prod",
     "Price" => "Prix",
     "price" => "prix",
+    "Return" => "Retour",
     "Total Tax" => "Total de l\'impôt",
     "Expired Date" => "Date d\'expiration",
     "Information on Label" => "Info sur l\'étiquette",
