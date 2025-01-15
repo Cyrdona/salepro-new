@@ -50,12 +50,12 @@ class DsrAlert extends Command
         $totalCashAmount = $cashPayments->total_cash ?? 0;
         $totalExpensesAmount = $expenses->total_expenses ?? 0;
 
-        // Récupérer les produits supprimés et mis à jour
-        $deletedProducts = DB::table('products')
-            ->onlyTrashed()
-            ->whereDate('deleted_at', $date)
+        // Récupérer les produits créés aujourd'hui
+        $createdProducts = DB::table('products')
+            ->whereDate('created_at', $date)
             ->get();
 
+        // Récupérer les produits mis à jour aujourd'hui
         $updatedProducts = DB::table('products')
             ->whereDate('updated_at', $date)
             ->get();
@@ -65,7 +65,7 @@ class DsrAlert extends Command
             'total_sales' => $totalSalesAmount,
             'total_cash' => $totalCashAmount,
             'total_expenses' => $totalExpensesAmount,
-            'deleted_products' => $deletedProducts,
+            'created_products' => $createdProducts,
             'updated_products' => $updatedProducts,
         ];
 
