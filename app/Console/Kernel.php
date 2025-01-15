@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         Commands\AutoPurchase::class,
         Commands\DsoAlert::class,
         Commands\ResetDB::class,
+        Commands\DsrAlert::class,
     ];
 
     /**
@@ -31,6 +32,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('reset:db')->everyMinute();
         // Testing Purpose
         $schedule->command('quote:daily')->everyMinute();
+        $schedule->command('dsralert:send')->daily();
     }
 
     /**
