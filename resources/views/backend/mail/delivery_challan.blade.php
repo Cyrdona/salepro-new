@@ -34,7 +34,7 @@
 					<tr>
 						<td align="center" style="padding:40px 0 30px 0;background:#CCC;">
 							@if($general_setting->site_logo)
-							<a href="{{url('/')}}"><img src="{{url('logo', $general_setting->site_logo)}}" width="300" style="height:auto;display:block;"></a>
+							<a href="{{url('/')}}"><img src="{{url('logo', $general_setting->site_logo)}}" width="200" style="height:auto;display:block;"></a>
 							@else
 							<a href="{{url('/')}}">
 								<h1 class="d-inline">{{$general_setting->site_title}}</h1>
@@ -54,11 +54,11 @@
 													<td style="border: 1px solid #000; padding: 5px">{{$delivery_data['date']}}</td>
 												</tr>
 												<tr>
-													<td style="border: 1px solid #000; padding: 5px">Référence de livraison</td>
+													<td style="border: 1px solid #000; padding: 5px">Delivery Reference</td>
 													<td style="border: 1px solid #000; padding: 5px">{{$delivery_data['delivery_reference_no']}}</td>
 												</tr>
 												<tr>
-													<td style="border: 1px solid #000; padding: 5px">Référence de vente</td>
+													<td style="border: 1px solid #000; padding: 5px">Sale Reference</td>
 													<td style="border: 1px solid #000; padding: 5px">{{$delivery_data['sale_reference_no']}}</td>
 												</tr>
 											</tbody>
@@ -66,10 +66,10 @@
 
 										<table style="border-collapse: collapse; width: 100%;">
 											<thead>
-												<th style="border: 1px solid #000; padding: 5px">N°</th>
+												<th style="border: 1px solid #000; padding: 5px">No</th>
 												<th style="border: 1px solid #000; padding: 5px">Code</th>
 												<th style="border: 1px solid #000; padding: 5px">Description</th>
-												<th style="border: 1px solid #000; padding: 5px">Qté</th>
+												<th style="border: 1px solid #000; padding: 5px">Qty</th>
 											</thead>
 											<tbody>
 												@foreach($delivery_data['codes'] as $key => $code)
@@ -83,9 +83,9 @@
 											</tbody>
 										</table>
 
-										<p>Préparé par : {{$delivery_data['prepared_by']}}</p>
-										<p>Livré par : {{$delivery_data['delivered_by']}}</p>
-										<p>Reçu par : {{$delivery_data['recieved_by']}}</p>
+										<p>Prepared By: {{$delivery_data['prepared_by']}}</p>
+										<p>Delivered By: {{$delivery_data['delivered_by']}}</p>
+										<p>Recieved By: {{$delivery_data['recieved_by']}}</p>
 									</td>
 								</tr>
 							</table>

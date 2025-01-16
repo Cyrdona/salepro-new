@@ -1,75 +1,140 @@
+<!-- resources/views/backend/mail/dsr_alert.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rapport quotidien des ventes</title>
+    <title>Rapport Quotidien des Ventes</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            background-color: #f7f7f7;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
+            line-height: 1.6;
         }
-        h1 {
-            background-color: #4CAF50;
-            color: white;
+
+        .container {
+            width: 90%;
+            margin: 0 auto;
+            background-color: #fff;
             padding: 20px;
-            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header img {
+            max-width: 150px;
+            height: auto;
+        }
+
+        h1 {
+            color: #5f6368;
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
         h2 {
             color: #4CAF50;
-            margin-top: 20px;
+            font-size: 20px;
+            margin: 15px 0 10px;
         }
-        p {
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section p {
             font-size: 16px;
-            margin: 10px 0;
+            color: #555;
         }
-        ul {
-            list-style-type: none;
-            padding-left: 0;
+
+        .section ul {
+            list-style: none;
+            padding: 0;
         }
-        li {
-            background-color: #fff;
-            margin: 5px 0;
+
+        .section li {
+            background-color: #f0f0f0;
             padding: 8px;
-            border: 1px solid #ddd;
+            margin-bottom: 8px;
             border-radius: 4px;
+            font-size: 16px;
         }
-        .empty-message {
-            color: #777;
-            font-style: italic;
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        .total {
+            font-weight: bold;
+            font-size: 18px;
+            color: #4CAF50;
         }
     </style>
 </head>
 <body>
-    <h1>Rapport quotidien des ventes</h1>
-    <p><strong>Total des ventes :</strong> {{ $reportData['total_sales'] }} </p>
-    <p><strong>Total des paiements en espèces :</strong> {{ $reportData['total_cash'] }} </p>
-    <p><strong>Total des dépenses :</strong> {{ $reportData['total_expenses'] }} </p>
+    <div class="container">
 
-    <h2>Produits créés aujourd'hui</h2>
-    @if(count($reportData['created_products']) > 0)
-        <ul>
-            @foreach ($reportData['created_products'] as $product)
-                <li>{{ $product->name }} (Code: {{ $product->code }})</li>
-            @endforeach
-        </ul>
-    @else
-        <p class="empty-message">Aucun produit créé aujourd'hui.</p>
-    @endif
+        <!-- Titre principal -->
+        <h1>Rapport Quotidien des Ventes et Mouvements</h1>
 
-    <h2>Produits mis à jour aujourd'hui</h2>
-    @if(count($reportData['updated_products']) > 0)
-        <ul>
-            @foreach ($reportData['updated_products'] as $product)
-                <li>{{ $product->name }} (Code: {{ $product->code }})</li>
-            @endforeach
-        </ul>
-    @else
-        <p class="empty-message">Aucun produit mis à jour aujourd'hui.</p>
-    @endif
+        <!-- Ventes Totales -->
+        <div class="section">
+            <h2>Ventes Totales</h2>
+            <p><strong>Total des ventes :</strong> <span class="total"><?php echo e(number_format($total_sales, 2)); ?> FCFA</span></p>
+        </div>
+
+        <!-- Paiements en Espèces -->
+        <div class="section">
+            <h2>Paiements en Espèces</h2>
+            <p><strong>Total des paiements en espèces :</strong> <span class="total"><?php echo e(number_format($total_cash, 2)); ?> FCFA</span></p>
+        </div>
+
+        <!-- Dépenses Totales -->
+        <div class="section">
+            <h2>Dépenses Totales</h2>
+            <p><strong>Total des dépenses :</strong> <span class="total"><?php echo e(number_format($total_expenses, 2)); ?> FCFA</span></p>
+        </div>
+
+        <!-- Produits Créés -->
+        <div class="section">
+            <h2>Produits Créés Aujourd'hui</h2>
+            <ul>
+                @foreach ($created_products as $product)
+                    <li>{{ $product->name }}</li>
+                @endforeach
+            </ul>
+        </div>
+
+        <!-- Produits Mis à Jour -->
+        <div class="section">
+            <h2>Produits Mis à Jour Aujourd'hui</h2>
+            <ul>
+                @foreach ($updated_products as $product)
+                    <li>{{ $product->name }}</li>
+                @endforeach
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Merci d'utiliser notre système de gestion. <a href="https://yourwebsite.com">Visitez notre site web</a> pour plus d'informations.</p>
+        </div>
+    </div>
 </body>
 </html>

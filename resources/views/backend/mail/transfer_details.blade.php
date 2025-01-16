@@ -47,30 +47,30 @@
 							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 								<tr>
 									<td style="padding:0 0 36px 0;color:#153643;">
-										<h1>Détails du Transfert</h1>
+										<h1>Transfer Details</h1>
 										<p><strong>Date: </strong>{{$mailData['date']}}</p>
-										<p><strong>Référence: </strong>{{$mailData['reference_no']}}</p>
+										<p><strong>Reference: </strong>{{$mailData['reference_no']}}</p>
 										<p>
-											<strong>Statut du Transfert: </strong>
-											@if($mailData['status']==1){{'Terminé'}}
-											@elseif($mailData['status']==2){{'En Attente'}}
-											@elseif($mailData['status']==2){{'Envoyé'}}
+											<strong>Transfer Status: </strong>
+											@if($mailData['status']==1){{'Completed'}}
+											@elseif($mailData['status']==2){{'Pending'}}
+											@elseif($mailData['status']==2){{'Sent'}}
 											@endif
 										</p>
 										<p>
-											<strong>Transfert De:</strong> {{ $mailData['from_warehouse']}} <br>
-											<strong>Transfert Vers:</strong> {{ $mailData['to_warehouse']}}
+											<strong>Transfer From:</strong> {{ $mailData['from_warehouse']}} <br>
+											<strong>Transfer To:</strong> {{ $mailData['to_warehouse']}}
 										</p>
 
-										<h3>Tableau des Transferts</h3>
+										<h3>Transfer Table</h3>
 										<table style="border-collapse: collapse; width: 100%;">
 											<thead>
 												<th style="border: 1px solid #000; padding: 5px">#</th>
-												<th style="border: 1px solid #000; padding: 5px">Produit</th>
-												<th style="border: 1px solid #000; padding: 5px">Quantité</th>
-												<th style="border: 1px solid #000; padding: 5px">Coût Unitaire</th>
-												<th style="border: 1px solid #000; padding: 5px">Taxe</th>
-												<th style="border: 1px solid #000; padding: 5px">Sous-Total</th>
+												<th style="border: 1px solid #000; padding: 5px">Product</th>
+												<th style="border: 1px solid #000; padding: 5px">Qty</th>
+												<th style="border: 1px solid #000; padding: 5px">Unit Cost</th>
+												<th style="border: 1px solid #000; padding: 5px">Tax</th>
+												<th style="border: 1px solid #000; padding: 5px">SubTotal</th>
 											</thead>
 											<tbody>
 												@php
@@ -94,14 +94,14 @@
 												</tr>
 												@if($mailData['shipping_cost'])
 												<tr>
-													<td colspan="3" style="border: 1px solid #000; padding: 5px"><strong>Coût d'Expédition </strong></td>
+													<td colspan="3" style="border: 1px solid #000; padding: 5px"><strong>Shipping Cost </strong></td>
 													<td style="border: 1px solid #000; padding: 5px"></td>
 													<td style="border: 1px solid #000; padding: 5px"></td>
 													<td style="border: 1px solid #000; padding: 5px">{{$mailData['shipping_cost']}}</td>
 												</tr>
 												@endif
 												<tr>
-													<td colspan="3" style="border: 1px solid #000; padding: 5px"><strong>Total Général </strong></td>
+													<td colspan="3" style="border: 1px solid #000; padding: 5px"><strong>Grand Total </strong></td>
 													<td style="border: 1px solid #000; padding: 5px"></td>
 													<td style="border: 1px solid #000; padding: 5px"></td>
 													<td style="border: 1px solid #000; padding: 5px">{{$mailData['grand_total']}}</td>
@@ -109,7 +109,7 @@
 											</tbody>
 										</table>
 
-										<p>Merci</p>
+										<p>Thank You</p>
 
 									</td>
 								</tr>

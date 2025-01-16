@@ -201,15 +201,7 @@
         }
     }
 
-    $(".daterangepicker-field").daterangepicker({
-  locale: {
-    format: 'YYYY-MM-DD',
-    applyLabel: 'Appliquer',
-    cancelLabel: 'Annuler',
-    customRangeLabel: 'Plage personnalisée',
-    daysOfWeek: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
-    monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
-  },
+$(".daterangepicker-field").daterangepicker({
   callback: function(startDate, endDate, period){
     var start_date = startDate.format('YYYY-MM-DD');
     var end_date = endDate.format('YYYY-MM-DD');

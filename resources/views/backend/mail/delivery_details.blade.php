@@ -34,7 +34,7 @@
 					<tr>
 						<td align="center" style="padding:40px 0 30px 0;background:#CCC;">
 							@if($general_setting->site_logo)
-							<a href="{{url('/')}}"><img src="{{url('logo', $general_setting->site_logo)}}" width="300" style="height:auto;display:block;"></a>
+							<a href="{{url('/')}}"><img src="{{url('logo', $general_setting->site_logo)}}" width="200" style="height:auto;display:block;"></a>
 							@else
 							<a href="{{url('/')}}">
 								<h1 class="d-inline">{{$general_setting->site_title}}</h1>
@@ -47,20 +47,20 @@
 							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 								<tr>
 									<td style="padding:0 0 36px 0;color:#153643;">
-										<h1>Détails de la Livraison</h1>
-										<h3>Cher(e) {{$delivery_data['customer']}},</h3>
+										<h1>Delivery Details</h1>
+										<h3>Dear {{$delivery_data['customer']}},</h3>
 										@if($delivery_data['status'] == 2)
-										<p>Votre produit est en cours de livraison.</p>
+										<p>Your Product is Delivering.</p>
 										@else
-										<p>Votre produit a été livré.</p>
+										<p>Your Product is Delivered.</p>
 										@endif
-										<p><strong>Référence de Vente : </strong>{{$delivery_data['sale_reference']}}</p>
-										<p><strong>Référence de Livraison : </strong>{{$delivery_data['delivery_reference']}}</p>
-										<p><strong>Destination : </strong>{{$delivery_data['address']}}</p>
+										<p><strong>Sale Reference: </strong>{{$delivery_data['sale_reference']}}</p>
+										<p><strong>Delivery Reference: </strong>{{$delivery_data['delivery_reference']}}</p>
+										<p><strong>Destination: </strong>{{$delivery_data['address']}}</p>
 										@if($delivery_data['delivered_by'])
-										<p><strong>Livré par : </strong>{{$delivery_data['delivered_by']}}</p>
+										<p><strong>Delivered By: </strong>{{$delivery_data['delivered_by']}}</p>
 										@endif
-										<p>Merci</p>
+										<p>Thank You</p>
 
 									</td>
 								</tr>

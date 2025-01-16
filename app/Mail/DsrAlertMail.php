@@ -7,29 +7,23 @@ use Illuminate\Queue\SerializesModels;
 
 class DsrAlertMail extends Mailable
 {
-    use SerializesModels;
-
     public $reportData;
 
-    /**
-     * Créer une nouvelle instance de la classe.
-     *
-     * @param  array  $reportData
-     * @return void
-     */
+    // Constructeur pour passer les données à la vue
     public function __construct($reportData)
     {
         $this->reportData = $reportData;
     }
 
-    /**
-     * Construire le message.
-     *
-     * @return $this
-     */
     public function build()
     {
-        return $this->subject('Rapport quotidien des ventes')
-                    ->view('backend.mail.dsr_alert'); // Vous pouvez personnaliser cette vue.
+        return $this->view('backend.mail.dsr_alert')
+                    ->with([
+                        'total_sales' => $this->reportData['total_sales'],
+                        'total_cash' => $this->reportData['total_cash'],
+                        'total_expenses' => $this->reportData['total_expenses'],
+                        'created_products' => $this->reportData['created_products'],
+                        'updated_products' => $this->reportData['updated_products'],
+                    ]);
     }
 }
