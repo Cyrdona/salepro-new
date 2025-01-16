@@ -26,13 +26,13 @@
 						</thead>
 					    <tbody>
 						    <tr>
-							    <td><strong>Dimanche</strong></td>
-                                <td><strong>Lundi</strong></td>
-                                <td><strong>Mardi</strong></td>
-                                <td><strong>Mercredi</strong></td>
-                                <td><strong>Jeudi</strong></td>
-                                <td><strong>Vendredi</strong></td>
-                                <td><strong>Samedi</strong></td>
+							    <td><strong>Sunday</strong></td>
+							    <td><strong>Monday</strong></td>
+							    <td><strong>Tuesday</strong></td>
+							    <td><strong>Wednesday</strong></td>
+							    <td><strong>Thrusday</strong></td>
+							    <td><strong>Friday</strong></td>
+							    <td><strong>Saturday</strong></td>
 						    </tr>
 						    <?php
 						    	$i = 1;
