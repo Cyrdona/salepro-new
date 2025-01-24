@@ -2,37 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Keygen\Keygen;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Unit;
-use App\Models\Tax;
-use App\Models\Warehouse;
-use App\Models\Supplier;
-use App\Models\Product;
-use App\Models\ProductBatch;
-use App\Models\Product_Warehouse;
-use App\Models\Product_Supplier;
-use App\Models\CustomField;
-use Auth;
-use DNS1D;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Illuminate\Validation\Rule;
 use DB;
-use App\Models\Variant;
-use App\Models\ProductVariant;
-use App\Models\Barcode;
-use App\Models\Purchase;
-use App\Models\ProductPurchase;
-use App\Models\Payment;
-use App\Traits\TenantInfo;
-use App\Traits\CacheForget;
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
+use Auth;
 use File;
+use DNS1D;
+use Exception;
+use Keygen\Keygen;
+use App\Models\Tax;
+use App\Models\Unit;
+use App\Models\Brand;
+use App\Models\Barcode;
+use App\Models\Payment;
+use App\Models\Product;
+use App\Models\Variant;
+use App\Models\Category;
+use App\Models\Purchase;
+use App\Models\Supplier;
+use App\Models\Warehouse;
+use App\Traits\TenantInfo;
+use App\Models\CustomField;
+use App\Traits\CacheForget;
+use Illuminate\Support\Str;
+use App\Models\ProductBatch;
+use Illuminate\Http\Request;
+use App\Models\ProductVariant;
+use App\Models\ProductPurchase;
+use Illuminate\Validation\Rule;
+use App\Models\Product_Supplier;
+use App\Models\Product_Warehouse;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Http;
+use Intervention\Image\ImageManager;
+use Spatie\Permission\Models\Permission;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ProductController extends Controller
 {
@@ -329,6 +331,22 @@ class ProductController extends Controller
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
+    private function diffSizeOfImagePathExistOrCreate()
+    {
+        if (!file_exists(public_path("images/product/xlarge")) && !is_dir(public_path("images/product/xlarge"))) {
+            mkdir(public_path("images/product/xlarge"), 0755, true);
+        }
+        if (!file_exists(public_path("images/product/large")) && !is_dir(public_path("images/product/large"))) {
+            mkdir(public_path("images/product/large"), 0755, true);
+        }
+        if (!file_exists(public_path("images/product/medium")) && !is_dir(public_path("images/product/medium"))) {
+            mkdir(public_path("images/product/medium"), 0755, true);
+        }
+        if (!file_exists(public_path("images/product/small")) && !is_dir(public_path("images/product/small"))) {
+            mkdir(public_path("images/product/small"), 0755, true);
+        }
+    }
+
     public function store(Request $request)
     {
         // return dd($request->all());
@@ -401,18 +419,7 @@ class ProductController extends Controller
         $image_names = [];
         if ($images) {
             // Ensure the necessary directories exist using public_path()
-            if (!file_exists(public_path("images/product/xlarge")) && !is_dir(public_path("images/product/xlarge"))) {
-                mkdir(public_path("images/product/xlarge"), 0755, true);
-            }
-            if (!file_exists(public_path("images/product/large")) && !is_dir(public_path("images/product/large"))) {
-                mkdir(public_path("images/product/large"), 0755, true);
-            }
-            if (!file_exists(public_path("images/product/medium")) && !is_dir(public_path("images/product/medium"))) {
-                mkdir(public_path("images/product/medium"), 0755, true);
-            }
-            if (!file_exists(public_path("images/product/small")) && !is_dir(public_path("images/product/small"))) {
-                mkdir(public_path("images/product/small"), 0755, true);
-            }
+            $this->diffSizeOfImagePathExistOrCreate();
 
             foreach ($images as $key => $image) {
                 $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
@@ -425,19 +432,20 @@ class ProductController extends Controller
                 } else {
                     $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
                 }
+                
 
                 $image->move(public_path('images/product'), $imageName);
 
-                $manager = new ImageManager(Driver::class);
-                $image = $manager->read(public_path('images/product/'). $imageName);
+                $manager = new ImageManager();
+                $image = $manager->make(public_path('images/product/'). $imageName);
 
-                $image->cover(1000, 1250)->save(public_path('images/product/xlarge/'). $imageName, 100);
+                $image->fit(1000, 1250)->save(public_path('images/product/xlarge/'). $imageName, 100);
 
-                $image->cover(500, 500)->save(public_path('images/product/large/'). $imageName, 100);
+                $image->fit(500, 500)->save(public_path('images/product/large/'). $imageName, 100);
 
-                $image->cover(250, 250)->save(public_path('images/product/medium/' . $imageName), 100);
+                $image->fit(250, 250)->save(public_path('images/product/medium/' . $imageName), 100);
 
-                $image->cover(100, 100)->save(public_path('images/product/small/' . $imageName), 100);
+                $image->fit(100, 100)->save(public_path('images/product/small/' . $imageName), 100);
 
                 // Collect image names for saving in the database
                 $image_names[] = $imageName;
@@ -1099,6 +1107,7 @@ class ProductController extends Controller
 
     public function updateProduct(Request $request)
     {
+        // return dd($request->all());
         if(!env('USER_VERIFIED')) {
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         }
@@ -1218,18 +1227,7 @@ class ProductController extends Controller
             //dealing with new images
             if ($request->image) {
                 // Ensure the necessary directories exist using public_path()
-                if (!file_exists(public_path("images/product/xlarge")) && !is_dir(public_path("images/product/xlarge"))) {
-                    mkdir(public_path("images/product/xlarge"), 0755, true);
-                }
-                if (!file_exists(public_path("images/product/large")) && !is_dir(public_path("images/product/large"))) {
-                    mkdir(public_path("images/product/large"), 0755, true);
-                }
-                if (!file_exists(public_path("images/product/medium")) && !is_dir(public_path("images/product/medium"))) {
-                    mkdir(public_path("images/product/medium"), 0755, true);
-                }
-                if (!file_exists(public_path("images/product/small")) && !is_dir(public_path("images/product/small"))) {
-                    mkdir(public_path("images/product/small"), 0755, true);
-                }
+                $this->diffSizeOfImagePathExistOrCreate();
 
                 $images = $request->image;
                 $image_names = [];
@@ -1246,16 +1244,16 @@ class ProductController extends Controller
 
                     $image->move(public_path('images/product'), $imageName);
 
-                    $manager = new ImageManager(Driver::class);
-                    $image = $manager->read(public_path('images/product/'). $imageName);
+                    $manager = new ImageManager();
+                    $image = $manager->make(public_path('images/product/'). $imageName);
 
-                    $image->cover(1000, 1250)->save(public_path('images/product/xlarge/'). $imageName, 100);
+                    $image->fit(1000, 1250)->save(public_path('images/product/xlarge/'). $imageName, 100);
 
-                    $image->cover(500, 500)->save(public_path('images/product/large/'). $imageName, 100);
+                    $image->fit(500, 500)->save(public_path('images/product/large/'). $imageName, 100);
 
-                    $image->cover(250, 250)->save(public_path('images/product/medium/' . $imageName), 100);
+                    $image->fit(250, 250)->save(public_path('images/product/medium/' . $imageName), 100);
 
-                    $image->cover(100, 100)->save(public_path('images/product/small/' . $imageName), 100);
+                    $image->fit(100, 100)->save(public_path('images/product/small/' . $imageName), 100);
 
                     $image_names[] = $imageName;
                 }
@@ -1710,6 +1708,52 @@ class ProductController extends Controller
                     $data['slug'] = Str::slug($data['name'], '-');
                     $product->slug = preg_replace('/[^A-Za-z0-9\-]/', '', $data['slug']);
                     $product->in_stock = true;
+                }
+
+                $image_names = [];
+                if ($product['image'] != 'zummXD2dvAtI.png') {
+                    $imageUrls = explode(',', $data['image']);
+                    // Ensure the necessary directories exist using public_path()
+                    $this->diffSizeOfImagePathExistOrCreate();
+
+                    foreach ($imageUrls as $url) {
+                        $response = Http::get($url);
+            
+                        if (!$response->successful()) {
+                            throw new Exception("Failed to fetch the image: {$url}");
+                        }
+
+                        $ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+                        $imageName = date("Ymdhis") . ($key + 1);
+
+                        if (!config('database.connections.saleprosaas_landlord')) {
+                            $imageName = $imageName . '.' . $ext;
+                        } else {
+                            $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
+                        }
+
+                        $manager = new ImageManager();
+
+                        $image = $manager->make($response->body());
+
+                        $image->save(public_path('images/product/') . $imageName);
+
+                        $image->fit(1000, 1250)->save(public_path('images/product/xlarge/') . $imageName, 100);
+
+                        $image->fit(500, 500)->save(public_path('images/product/large/') . $imageName, 100);
+
+                        $image->fit(250, 250)->save(public_path('images/product/medium/') . $imageName, 100);
+
+                        $image->fit(100, 100)->save(public_path('images/product/small/') . $imageName, 100);
+
+                        // Collect image names for saving in the database
+                        $image_names[] = $imageName;
+    
+                        // return dd($imageName);
+                    }
+
+                    // Save the image names in the database
+                    $product['image'] = implode(",", $image_names);
                 }
 
                 $product->save();

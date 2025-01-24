@@ -156,12 +156,12 @@ class CategoryController extends Controller
             if (!file_exists(public_path('images/category/large/'))) {
                 mkdir(public_path('images/category/large/'), 0755, true);
             }
-            $manager = new ImageManager(Driver::class);
-            $image = $manager->read(public_path('images/category/'). $imageName);
+            $manager = new ImageManager();
+            $image = $manager->make(public_path('images/category/'). $imageName);
 
-            $image->cover(600, 750)->save(public_path('images/category/large/'). $imageName, 100);
+            $image->fit(600, 750)->save(public_path('images/category/large/'). $imageName, 100);
 
-            $image->cover(300, 300)->save();
+            $image->fit(300, 300)->save();
 
 
             $lims_category_data['image'] = $imageName;
@@ -181,10 +181,10 @@ class CategoryController extends Controller
                 $iconName = $this->getTenantId() . '_' . $iconName . '.' . $ext;
                 $icon->move(public_path('images/category/icons/'), $iconName);
             }
-            $manager = new ImageManager(Driver::class);
-            $image = $manager->read(public_path('images/category/icons/'). $iconName);
+            $manager = new ImageManager();
+            $image = $manager->make(public_path('images/category/icons/'). $iconName);
 
-            $image->cover(100, 100)->save();
+            $image->fit(100, 100)->save();
             
             $lims_category_data['icon'] = $iconName;
         }
@@ -265,12 +265,12 @@ class CategoryController extends Controller
             if (!file_exists(public_path('images/category/large/'))) {
                 mkdir(public_path('images/category/large/'), 0755, true);
             }
-            $manager = new ImageManager(Driver::class);
-            $image = $manager->read(public_path('images/category/'). $imageName);
+            $manager = new ImageManager();
+            $image = $manager->make(public_path('images/category/'). $imageName);
 
-            $image->cover(600, 750)->save(public_path('images/category/large/'). $imageName, 100);
+            $image->fit(600, 750)->save(public_path('images/category/large/'). $imageName, 100);
 
-            $image->cover(300, 300)->save();
+            $image->fit(300, 300)->save();
              
             $input['image'] = $imageName;
         }
@@ -292,10 +292,10 @@ class CategoryController extends Controller
                 $iconName = $this->getTenantId() . '_' . $iconName . '.' . $ext;
                 $icon->move(public_path('images/category/icons/'), $iconName);
             }
-            $manager = new ImageManager(Driver::class);
-            $image = $manager->read(public_path('images/category/icons/'). $iconName);
+            $manager = new ImageManager();
+            $image = $manager->make(public_path('images/category/icons/'). $iconName);
 
-            $image->cover(100, 100)->save();
+            $image->fit(100, 100)->save();
 
             $input['icon'] = $iconName;
         }

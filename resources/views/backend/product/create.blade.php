@@ -1621,7 +1621,7 @@
         paramName: 'image',
         clickable: true,
         method: 'POST',
-        url: '{{route('products.store')}}',
+        url: "{{route('products.store')}}",
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
@@ -1653,7 +1653,7 @@
 
                         $.ajax({
                             type:'POST',
-                            url:'{{route('products.store')}}',
+                            url:"{{route('products.store')}}",
                             data: formData,
                             contentType: false,
                             processData: false,
@@ -1684,17 +1684,17 @@
                 var file = $('#file')[0].files;
                 if(file.length > 0)
                     formData.append('file',file[0]);
-                console.log(formData);
+                // console.log(formData);
             });
         },
         error: function (file, response) {
-            console.log(response);
-            if(response.errors.name) {
-              $("#name-error").text(response.errors.name);
+            console.log(response.message, 'hi');
+            if(response.message) {
+              $("#name-error").text(response.message);
               this.removeAllFiles(true);
             }
-            else if(response.errors.code) {
-              $("#code-error").text(response.errors.code);
+            else if(response.code) {
+              $("#code-error").text(response.code);
               this.removeAllFiles(true);
             }
             else {
@@ -1719,7 +1719,7 @@
                       return _results;
                   }
               } catch (error) {
-                  console.log(error);
+                  console.log(error, 'hi');
               }
             }
         },

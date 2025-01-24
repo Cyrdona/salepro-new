@@ -72,24 +72,41 @@
               </div>
               <button type="submit" class="btn btn-primary btn-block">{{trans('file.LogIn')}}</button>
             </form>
-            @if(!env('USER_VERIFIED'))
-            <!-- This three button for demo only-->
-            <button type="submit" class="btn btn-success admin-btn">LogIn as Admin</button>
-            <button type="submit" class="btn btn-info staff-btn">LogIn as Staff</button>
-            <button type="submit" class="btn btn-dark customer-btn">LogIn as Customer</button>
-            <br><br>
-            <a href="?demo_type=salepro_m" class="btn btn-dark demo-btn">manufacturing</a>
-                        <br><br>
-            @endif
             <a href="{{ route('password.request') }}" class="forgot-pass">{{trans('file.Forgot Password?')}}</a>
-            <p class="register-section">{{trans('file.Do not have an account?')}}</p>
-            <a href="{{url('register')}}" class="signup register-section">{{trans('file.Register')}}</a>
+            <p class="register-section">
+              {{trans('file.Do not have an account?')}} 
+              <a href="{{url('register')}}" class="signup register-section">{{trans('file.Register')}}</a>
+            </p>
           </div>
           <div class="copyrights text-center">
             <p>{{trans('file.Developed By')}} <span class="external">{{$general_setting->developed_by}}</span></p>
           </div>
         </div>
       </div>
+
+      @if(!env('USER_VERIFIED'))
+      <div class="switch-theme" id="switch-theme" style="background-color:rgba(255,255,255,0.9);border:1px solid #999;padding:15px;position:fixed;bottom:0px;left:0px;right:0px;z-index:99">
+        <div class="row">
+          <div class="col-md-4 text-center">
+            <!-- This three button for demo only-->
+            <div class="" style="font-size:11px;color:#666;margin-bottom:15px">Login as</div>
+            <button type="submit" class="btn btn-sm btn-success admin-btn">Admin</button>
+            <button type="submit" class="btn btn-sm btn-info staff-btn">Staff</button>
+            <button type="submit" class="btn btn-sm btn-dark customer-btn">Customer</button>
+          </div>
+          <div class="col-md-8 text-center">
+            <hr class="d-lg-none d-md-none d-sm-block">
+            <div class="text-center" style="font-size:11px;color:#666;margin-bottom:15px">Premium Add-ons</div>
+            <a href="?demo_type=saleprop_salepro" class="btn btn-primary btn-sm demo-btn">Default</a>
+            <a href="?demo_type=saleprop_ecom" class="btn btn-primary btn-sm demo-btn">eCommerce</a>
+            <!-- <a href="?demo_type=saleprop_woo" class="btn btn-primary btn-sm demo-btn">WooCommerce</a>
+            <a href="?demo_type=salepro_restaurant" class="btn btn-primary btn-sm demo-btn">Restaurant</a> -->
+            <a href="https://lion-coders.com/software/salepro-saas-pos-inventory-saas-php-script"  target="_blank" class="btn btn-primary btn-sm">SAAS</a>
+                        <br><br>
+          </div>
+        </div>
+      </div>
+      @endif
     </div>
   </body>
 </html>
@@ -129,10 +146,6 @@
         $('body').removeClass('dark-mode');
         $('#switch-theme i').addClass('dripicons-brightness-max');
     }
-    $('.admin-btn').on('click', function(){
-        $("input[name='name']").focus().val('admin');
-        $("input[name='password']").focus().val('admin');
-    });
 
     $('.demo-btn').on('click', function(e) {
         e.preventDefault();
@@ -159,17 +172,20 @@
     $('.admin-btn').on('click', function(){
         $("input[name='name']").focus().val('admin');
         $("input[name='password']").focus().val('admin');
+        $('#login-form').submit();
     });
 
-  $('.staff-btn').on('click', function(){
-      $("input[name='name']").focus().val('staff');
-      $("input[name='password']").focus().val('staff');
-  });
+    $('.staff-btn').on('click', function(){
+        $("input[name='name']").focus().val('staff');
+        $("input[name='password']").focus().val('staff');
+        $('#login-form').submit();
+    });
 
-  $('.customer-btn').on('click', function(){
-      $("input[name='name']").focus().val('james');
-      $("input[name='password']").focus().val('james');
-  });
+    $('.customer-btn').on('click', function(){
+        $("input[name='name']").focus().val('james');
+        $("input[name='password']").focus().val('james');
+        $('#login-form').submit();
+    });
   // ------------------------------------------------------- //
     // Material Inputs
     // ------------------------------------------------------ //

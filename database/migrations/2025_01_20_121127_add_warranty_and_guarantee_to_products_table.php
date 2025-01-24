@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->integer('guarantee')->nullable()->after('woocommerce_media_id');
+            $table->integer('guarantee')->nullable()->after('is_active');
             $table->integer('warranty')->nullable()->after('guarantee');
             $table->string('guarantee_type')->nullable()->after('warranty');
             $table->string('warranty_type')->nullable()->after('guarantee_type');

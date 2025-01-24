@@ -1755,7 +1755,9 @@
                             contentType: false,
                             processData: false,
                             success:function(response) {
-                                console.log(response);
+                                // setTimeout(function () {
+                                    window.location.reload();
+                                // }, 1000);
                                 //location.href = redirectUrl;
                             },
                             error:function(response) {
@@ -1820,7 +1822,8 @@
             }*/
         },
         successmultiple: function (file, response) {
-            location.href = redirectUrl;
+                window.location.reload();
+            // location.href = redirectUrl;
             //console.log('sss: '+ response);
         },
         completemultiple: function (file, response) {
