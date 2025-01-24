@@ -262,6 +262,9 @@ class CategoryController extends Controller
                 $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
                 $image->move(public_path('images/category'), $imageName);
             }
+            if (!file_exists(public_path('images/category/large/'))) {
+                mkdir(public_path('images/category/large/'), 0755, true);
+            }
             $manager = new ImageManager(Driver::class);
             $image = $manager->read(public_path('images/category/'). $imageName);
 

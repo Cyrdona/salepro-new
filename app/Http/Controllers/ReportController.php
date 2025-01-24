@@ -866,6 +866,8 @@ class ReportController extends Controller
         return view('backend.report.product_report',compact('start_date', 'end_date', 'warehouse_id', 'lims_warehouse_list'));
     }
 
+   
+
     public function productReportData(Request $request)
     {
         $data = $request->all();
@@ -916,6 +918,8 @@ class ReportController extends Controller
                                 ->get();
         }
 
+        
+        // return $lims_product_all;
         $totalFiltered = $totalData;
         $data = [];
         foreach ($lims_product_all as $product) {
@@ -925,8 +929,9 @@ class ReportController extends Controller
                     $variant_id_all = ProductVariant::where('product_id', $product->id)->pluck('variant_id', 'item_code');
                     foreach ($variant_id_all as $item_code => $variant_id) {
                         $variant_data = Variant::select('name')->find($variant_id);
+                        $nestedData['imei_numbers'] = $this->findImeis($product->id, $variant_id);
                         $nestedData['key'] = count($data);
-                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'.$item_code;
+                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'. 'Product Code: ' . $item_code;
                         $nestedData['category'] = $product->category->name;
                         //purchase data
                         $nestedData['purchased_amount'] = ProductPurchase::where([
@@ -1071,8 +1076,9 @@ class ReportController extends Controller
                     }
                 }
                 else {
+                    $nestedData['imei_numbers'] = $this->findImeis($product->id);
                     $nestedData['key'] = count($data);
-                    $nestedData['name'] = $product->name.'<br>'.$product->code;
+                    $nestedData['name'] = $product->name.'<br>'. 'Product Code: ' . $product->code;
                     $nestedData['category'] = $product->category->name;
                     //purchase data
                     $nestedData['purchased_amount'] = ProductPurchase::where('product_id', $product->id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total');
@@ -1191,8 +1197,9 @@ class ReportController extends Controller
 
                     foreach ($variant_id_all as $item_code => $variant_id) {
                         $variant_data = Variant::select('name')->find($variant_id);
+                        $nestedData['imei_numbers'] = $this->findImeis($product->id, $variant_id);
                         $nestedData['key'] = count($data);
-                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'.$item_code;
+                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'. 'Product Code: ' . $item_code;
                         $nestedData['category'] = $product->category->name;
                         //purchase data
                         $nestedData['purchased_amount'] = DB::table('purchases')
@@ -1381,8 +1388,9 @@ class ReportController extends Controller
                     }
                 }
                 else {
+                    $nestedData['imei_numbers'] = $this->findImeis($product->id);
                     $nestedData['key'] = count($data);
-                    $nestedData['name'] = $product->name.'<br>'.$product->code;
+                    $nestedData['name'] = $product->name.'<br>'. 'Product Code: ' . $product->code;
                     $nestedData['category'] = $product->category->name;
                     //purchase data
                     $nestedData['purchased_amount'] = DB::table('purchases')
@@ -1562,7 +1570,9 @@ class ReportController extends Controller
                     $data[] = $nestedData;
                 }
             }
-        }
+
+        } 
+
         /*$totalData = count($data);
         $totalFiltered = $totalData;*/
         $json_data = array(
@@ -1573,6 +1583,46 @@ class ReportController extends Controller
         );
 
         echo json_encode($json_data);
+        // return json_encode($json_data);
+    }
+
+    private function findImeis(string $product_id, string $variant_id = '0')
+    {
+        $imei_numbers = [];
+        $purchases = [];
+        if ($variant_id === '0') {
+            $purchases = ProductPurchase::where('product_id', $product_id)
+                ->whereNotNull('imei_number')
+                ->select('imei_number')->get();
+        } else {
+            $purchases = ProductPurchase::where('product_id', $product_id)
+                ->where('variant_id', '=', $variant_id)
+                ->whereNotNull('imei_number')
+                ->select('imei_number')->get();
+        }
+        
+        foreach ($purchases as $purchase) {
+            $imei_numbers[] = explode(',', $purchase->imei_number);
+        }
+        $imeis = [];
+        foreach ($imei_numbers as $imei_number) {
+            foreach ($imei_number as $imei) {
+                $imeis[] = $imei;
+            }
+        }
+
+        $convert_to_string = '';
+        foreach ($imeis as $key => $value) {
+            $convert_to_string .= $value;
+            if (count($imeis)-1 > $key) {
+                $convert_to_string .= '<br/>';
+            }
+        }
+
+        if (!count($imeis)) {
+            return 'N/A';
+        }
+        return $convert_to_string;
     }
 
     public function purchaseReport(Request $request)
@@ -1710,7 +1760,8 @@ class ReportController extends Controller
                     foreach ($variant_id_all as $item_code => $variant_id) {
                         $variant_data = Variant::select('name')->find($variant_id);
                         $nestedData['key'] = count($data);
-                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'.$item_code;
+                        $imeis = $this->findImeis($product->id, $variant_id);
+                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'. 'Product Code: ' . $item_code . ($imeis != 'N/A' ? '<br>' . 'IMEI: ' . str_replace("<br/>", ",", $imeis) : '');
                         $nestedData['category'] = $product->category->name;
                         //purchase data
                         $nestedData['purchased_amount'] = ProductPurchase::where([
@@ -1749,7 +1800,8 @@ class ReportController extends Controller
                 }
                 else {
                     $nestedData['key'] = count($data);
-                    $nestedData['name'] = $product->name.'<br>'.$product->code;
+                    $imeis = $this->findImeis($product->id);
+                    $nestedData['name'] = $product->name.'<br>'. 'Product Code: ' . $product->code . ($imeis != 'N/A' ? '<br>' . 'IMEI: ' . str_replace("<br/>", ",", $imeis) : '');
                     $nestedData['category'] = $product->category->name;
                     //purchase data
                     $nestedData['purchased_amount'] = ProductPurchase::where('product_id', $product->id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total');
@@ -1781,7 +1833,7 @@ class ReportController extends Controller
                     foreach ($variant_id_all as $item_code => $variant_id) {
                         $variant_data = Variant::select('name')->find($variant_id);
                         $nestedData['key'] = count($data);
-                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'.$item_code;
+                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'. 'Product Code: ' . $item_code;
                         $nestedData['category'] = $product->category->name;
                         //purchase data
                         $nestedData['purchased_amount'] = DB::table('purchases')
@@ -1828,7 +1880,7 @@ class ReportController extends Controller
                 }
                 else {
                     $nestedData['key'] = count($data);
-                    $nestedData['name'] = $product->name.'<br>'.$product->code;
+                    $nestedData['name'] = $product->name.'<br>'. 'Product Code: ' . $product->code;
                     $nestedData['category'] = $product->category->name;
                     //purchase data
                     $nestedData['purchased_amount'] = DB::table('purchases')
@@ -1871,6 +1923,7 @@ class ReportController extends Controller
                 }
             }
         }
+
         /*$totalData = count($data);
         $totalFiltered = $totalData;*/
         $json_data = array(
@@ -1951,7 +2004,8 @@ class ReportController extends Controller
                     foreach ($variant_id_all as $item_code => $variant_id) {
                         $variant_data = Variant::select('name')->find($variant_id);
                         $nestedData['key'] = count($data);
-                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'.$item_code;
+                        $imeis = $this->findImeis($product->id, $variant_id);
+                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'. 'Product Code: ' . $item_code . ($imeis != 'N/A' ? '<br>' . 'IMEI: ' . str_replace("<br/>", ",", $imeis) : '');
                         $nestedData['category'] = $product->category->name;
                         //sale data
                         $nestedData['sold_amount'] = Product_Sale::where([
@@ -1988,7 +2042,8 @@ class ReportController extends Controller
                 }
                 else {
                     $nestedData['key'] = count($data);
-                    $nestedData['name'] = $product->name.'<br>'.$product->code;
+                    $imeis = $this->findImeis($product->id);
+                    $nestedData['name'] = $product->name.'<br>'. 'Product Code: ' . $product->code . ($imeis != 'N/A' ? '<br>' . 'IMEI: ' . str_replace("<br/>", ",", $imeis) : '');
                     $nestedData['category'] = $product->category->name;
 
                     //sale data
@@ -2025,7 +2080,7 @@ class ReportController extends Controller
                     foreach ($variant_id_all as $item_code => $variant_id) {
                         $variant_data = Variant::select('name')->find($variant_id);
                         $nestedData['key'] = count($data);
-                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'.$item_code;
+                        $nestedData['name'] = $product->name . ' [' . $variant_data->name . ']'.'<br>'. 'Product Code: ' . $item_code;
                         $nestedData['category'] = $product->category->name;
 
                         //sale data
@@ -2076,7 +2131,7 @@ class ReportController extends Controller
                 }
                 else {
                     $nestedData['key'] = count($data);
-                    $nestedData['name'] = $product->name.'<br>'.$product->code;
+                    $nestedData['name'] = $product->name.'<br>'. 'Product Code: ' . $product->code;
                     $nestedData['category'] = $product->category->name;
 
                     //sale data
@@ -2123,6 +2178,9 @@ class ReportController extends Controller
                 }
             }
         }
+
+        // return dd($data);
+
         /*$totalData = count($data);
         $totalFiltered = $totalData;*/
         $json_data = array(

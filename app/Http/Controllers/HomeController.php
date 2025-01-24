@@ -95,6 +95,15 @@ class HomeController extends Controller
             return view('backend.customer_index', compact('customer', 'lims_sale_data', 'lims_payment_data', 'lims_quotation_data', 'lims_return_data', 'lims_reward_point_setting_data'));
         }
 
+        if(in_array('restaurant',explode(',',cache()->get('general_setting')->modules))){
+            if(Auth::user()->role_id > 2 && isset(Auth::user()->kitchen_id)){
+
+                $result = (new \Modules\Restaurant\Http\Controllers\KitchenController)->dashboard();
+
+                return $result;
+            }
+        }
+
         $start_date = date("Y").'-'.date("m").'-'.'01';
         $end_date = date("Y").'-'.date("m").'-'.date('t', mktime(0, 0, 0, date("m"), 1, date("Y")));
         $yearly_sale_amount = [];

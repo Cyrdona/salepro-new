@@ -40,7 +40,7 @@
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
                                 <li>
-                                    <button type="button" data-id="{{$table->id}}" data-name="{{$table->name}}" data-number_of_person="{{$table->number_of_person}}" data-description="{{$table->description}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal" ><i class="dripicons-document-edit"></i>  {{trans('file.edit')}}</button>
+                                    <button type="button" data-id="{{$table->id}}" data-name="{{$table->name}}" data-number_of_person="{{$table->number_of_person}}" data-description="{{$table->description}}" data-floor_id="{{$table->floor_id}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal" ><i class="dripicons-document-edit"></i>  {{trans('file.edit')}}</button>
                                 </li>
                                 <li class="divider"></li>
                                 {{ Form::open(['route' => ['tables.destroy', $table->id], 'method' => 'DELETE'] ) }}
@@ -80,9 +80,19 @@
 	                {{Form::number('number_of_person', null, array('required' => 'required', 'class' => 'form-control'))}}
 	            </div>
 	            <div class="col-md-12 form-group">
-	                <label>{{trans('file.Description')}} *</label>
+	                <label>{{trans('file.Description')}}</label>
 	                <textarea class="form-control" name="description" rows="5"></textarea>
 	            </div>
+                @if(isset($floors))
+                <div class="col-md-12 form-group">
+	                <label>{{trans('file.Floor')}} *</label>
+	                <select class="selectpicker form-control" name="floor_id">
+                        @foreach($floors as $floor)
+                        <option value="{{$floor->id}}">{{$floor->name}}</option>
+                        @endforeach
+                    </select>
+	            </div>
+                @endif
           	</div>
             <div class="form-group">
               <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
@@ -116,9 +126,19 @@
 	                {{Form::number('number_of_person', null, array('required' => 'required', 'class' => 'form-control'))}}
 	            </div>
 	            <div class="col-md-12 form-group">
-	                <label>{{trans('file.Description')}} *</label>
+	                <label>{{trans('file.Description')}}</label>
 	                <textarea class="form-control" name="description" rows="5"></textarea>
 	            </div>
+                @if(isset($floors))
+                <div class="col-md-12 form-group">
+	                <label>{{trans('file.Floor')}} *</label>
+	                <select class="selectpicker form-control" id="floor_id" name="floor_id">
+                        @foreach($floors as $floor)
+                        <option value="{{$floor->id}}">{{$floor->name}}</option>
+                        @endforeach
+                    </select>
+	            </div>
+                @endif
 	      	</div>
 	        <div class="form-group">
 	          <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
@@ -156,6 +176,8 @@ $(document).ready(function() {
         $("#editModal input[name='name']").val($(this).data('name'));
         $("#editModal input[name='number_of_person']").val($(this).data('number_of_person'));
         $("#editModal textarea[name='description']").val($(this).data('description'));
+        $("#floor_id").val($(this).data('floor_id'));
+        $('.selectpicker').selectpicker('refresh');
     });
 });
 

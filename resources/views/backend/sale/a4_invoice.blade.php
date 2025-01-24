@@ -57,7 +57,7 @@
                     <?php
                         foreach($sale_custom_fields as $key => $fieldName) {
                             $field_name = str_replace(" ", "_", strtolower($fieldName));
-                            echo '<div><span>'.$fieldName.': ' . $lims_sale_data->$field_name.'</span></div>';
+                            echo '<div><span>'.$fieldName.':hello ' . $lims_sale_data->$field_name.'</span></div>';
                         }
                         foreach($customer_custom_fields as $key => $fieldName) {
                             $field_name = str_replace(" ", "_", strtolower($fieldName));
@@ -132,6 +132,7 @@
                 $total_product_tax = 0;
                 $totalPrice = 0;
             ?>
+            
             @foreach($lims_product_sale_data as $key => $product_sale_data)
             <?php
                 $lims_product_data = \App\Models\Product::find($product_sale_data->product_id);
@@ -149,30 +150,81 @@
                 else
                     $variant_name = '';
                 $totalPrice += $product_sale_data->net_unit_price * $product_sale_data->qty;
+
+                $topping_names = [];
+                $topping_prices = [];
+                $topping_price_sum = 0;
+        
+                if ($product_sale_data->topping_id) {
+                    $decoded_topping_id = json_decode(json_decode($product_sale_data->topping_id), true);
+                    //dd(json_decode($product_sale_data->topping_id));
+                    if (is_array($decoded_topping_id)) {
+                        foreach ($decoded_topping_id as $topping) {
+                            $topping_names[] = $topping['name']; // Extract name
+                            $topping_prices[] = $topping['price']; // Extract price
+                            $topping_price_sum += $topping['price']; // Sum up prices
+                        }
+                    }
+                }
+        
+                $net_price_with_toppings = $product_sale_data->net_unit_price + $topping_price_sum;
+                $total = ($product_sale_data->net_unit_price + $topping_price_sum) * $product_sale_data->qty;
+
+                $subtotal = ($product_sale_data->total+ $topping_price_sum);
             ?>
             <tr>
                 <td style="@if( Config::get('app.locale') == 'ar' || $general_setting->is_rtl){{'border-right:1px solid #222;'}}@endif border:1px solid #222;padding:1px 3px;text-align: center;">{{$key+1}}</td>
                 <td style="border:1px solid #222;padding:1px 3px;font-size: 15px;line-height: 1.2;">
+
+                    <span style="font-weight: bold;">Product Name</span>: 
+
                     {!!$lims_product_data->name!!}
+
+                    @if(!empty($topping_names))
+                        <br><small>({{ implode(', ', $topping_names) }})</small>
+                    @endif
+
                     @foreach($product_custom_fields as $index => $fieldName)
                         <?php $field_name = str_replace(" ", "_", strtolower($fieldName)) ?>
                         @if($lims_product_data->$field_name)
                             @if(!$index)
-                            <br>{{$fieldName.': '.$lims_product_data->$field_name}}
+                            <br>
+                            <span style="font-weight: bold;">{{ $fieldName }}</span>
+                            {{ ': ' . $lims_product_data->$field_name }}
                             @else
-                            {{'/'.$fieldName.': '.$lims_product_data->$field_name}}
+                            <br>
+                            <span style="font-weight: bold;">{{ $fieldName }}</span>
+                            {{': ' . $lims_product_data->$field_name }}
                             @endif
                         @endif
                     @endforeach
                     @if($product_sale_data->imei_number && !str_contains($product_sale_data->imei_number, "null") )
                     <br>IMEI or Serial: {{$product_sale_data->imei_number}}
                     @endif
+                    <!-- warranty -->
+                     @if (isset($product_sale_data->warranty_duration))
+                            <br>
+                            <span style="font-weight: bold;">Warranty</span>{{ ': ' . $product_sale_data->warranty_duration }}
+                            <br>
+                            <span style="font-weight: bold;">Will Expire</span>{{ ': ' . $product_sale_data->warranty_end }}
+                     @endif
+                     <!-- guarantee -->
+                     @if (isset($product_sale_data->guarantee_duration))
+                            <br>
+                            <span style="font-weight: bold;">Guarantee</span>{{ ': ' . $product_sale_data->guarantee_duration }}
+                            <br>
+                            <span style="font-weight: bold;">Will Expire</span>{{ ': ' . $product_sale_data->guarantee_end }}
+                     @endif
                 </td>
                 <td style="border:1px solid #222;padding:1px 3px;text-align:center">{{$product_sale_data->qty.' '.$unit_code.' '.$variant_name}}</td>
-                <td style="border:1px solid #222;padding:1px 3px;text-align:center">{{number_format($product_sale_data->net_unit_price, $general_setting->decimal, '.', ',')}}</td>
-                <td style="border:1px solid #222;padding:1px 3px;text-align:center">{{number_format(($product_sale_data->net_unit_price * $product_sale_data->qty), $general_setting->decimal, '.', ',')}}</td>
+                <td style="border:1px solid #222;padding:1px 3px;text-align:center">{{number_format($product_sale_data->net_unit_price, $general_setting->decimal, '.', ',')}}
+                @if(!empty($topping_prices))
+                    <br><small>+ {{ implode(' + ', array_map(fn($price) => number_format($price, $general_setting->decimal, '.', ','), $topping_prices)) }}</small>
+                @endif
+                </td>
+                <td style="border:1px solid #222;padding:1px 3px;text-align:center">{{ number_format($total, $general_setting->decimal, '.', ',') }}</td>
                 <td style="border:1px solid #222;padding:1px 3px;text-align:center">{{number_format($product_sale_data->tax, $general_setting->decimal, '.', ',')}}</td>
-                <td style="border:1px solid #222;border-right:1px solid #222;padding:1px 3px;text-align:center;font-size: 15px;">{{number_format($product_sale_data->total, $general_setting->decimal, '.', ',')}}</td>
+                <td style="border:1px solid #222;border-right:1px solid #222;padding:1px 3px;text-align:center;font-size: 15px;">{{number_format($subtotal, $general_setting->decimal, '.', ',')}}</td>
             </tr>
             @endforeach
             <tr>

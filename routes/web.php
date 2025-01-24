@@ -317,6 +317,7 @@ Route::group(['middleware' => ['common', 'auth', 'active']], function() {
         Route::post('sales/sendmail', 'sendMail')->name('sale.sendmail');
         Route::get('sales/sale_by_csv', 'saleByCsv');
         Route::get('sales/product_sale/{id}', 'productSaleData');
+        Route::get('sales/get-sale/{id}', 'getSale');
         Route::post('importsale', 'importSale')->name('sale.import');
         Route::get('pos/{id?}', 'posSale')->name('sale.pos');
         Route::get('sales/recent-sale', 'recentSale');
@@ -718,4 +719,3 @@ Route::group(['middleware' => ['common', 'auth', 'active']], function() {
 
     Route::post('ecommerce-install', [AddonInstallController::class,'ecommerceInstall'])->name('ecommerce.install');
 });
-

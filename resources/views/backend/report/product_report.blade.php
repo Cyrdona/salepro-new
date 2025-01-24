@@ -52,6 +52,7 @@
                     <th class="not-exported"></th>
                     <th>{{trans('file.Product')}}</th>
                     <th>{{trans('file.category')}}</th>
+                    <th>{{trans('file.imei_numbers')}}</th>
                     <th>{{trans('file.Purchased Amount')}}</th>
                     <th>{{trans('file.Purchased')}} {{trans('file.qty')}}</th>
                     <!-- <th>Transfered Amount</th>
@@ -69,6 +70,7 @@
             </thead>
 
             <tfoot class="tfoot active">
+                <th></th>
                 <th></th>
                 <th>{{trans('file.Total')}}</th>
                 <th></th>
@@ -143,6 +145,7 @@
             {"data": "key"},
             {"data": "name"},
             {"data": "category"},
+            {"data": "imei_numbers"},
             {"data": "purchased_amount"},
             {"data": "purchased_qty"},
             /*{"data": "transfered_amount"},
@@ -157,6 +160,10 @@
             {"data": "in_stock"},
             {"data": "stock_worth"},
         ],
+        'createdRow': function(row, data, dataIndex) {
+            // Apply the scrollable class to the IMEI numbers cell
+            $('td', row).eq(3).attr('style', 'max-height: 100px; overflow-y: auto; word-break: break-word; white-space: normal; display: block; padding-right: 10px;');
+        },
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
@@ -170,7 +177,8 @@
         'columnDefs': [
             {
                 "orderable": false,
-                'targets': [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, /*12, 13*/]
+
+                'targets': [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
             },
             {
                 'render': function(data, type, row, meta){
@@ -259,12 +267,25 @@
         }
     } );
 
+    function stock_worth_price_cost_from_string(values) {
+        stock_worth_price = 0;
+        stock_worth_cost = 0;
+        for (let i = 0; i < values.length; i++) {
+            value = values[i].split(' ');
+            [divident, divisor] = [value[1], value[4]];
+            stock_worth_price += Number(divident);
+            stock_worth_cost += Number(divisor);
+        }
+
+        return [stock_worth_price, stock_worth_cost];
+    }
+
     function datatable_sum(dt_selector, is_calling_first) {
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
 
             
-            $( dt_selector.column( 3 ).footer() ).html(dt_selector.cells( rows, 3, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
+            // $( dt_selector.column( 4 ).footer() ).html(dt_selector.cells( rows, 3, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 4 ).footer() ).html(dt_selector.cells( rows, 4, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 5 ).footer() ).html(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
@@ -274,9 +295,17 @@
             $( dt_selector.column( 10 ).footer() ).html(dt_selector.cells( rows, 10, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 11 ).footer() ).html(dt_selector.cells( rows, 11, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 12 ).footer() ).html(dt_selector.cells( rows, 12, { page: 'current' } ).data().sum().toFixed(12));
+
+            [stock_worth_price, stock_worth_cost] = stock_worth_price_cost_from_string(dt_selector.column(13, { page: 'current' }).data());
+
+            // $( dt_selector.column( 13 ).footer() ).html(dt_selector.cells(rows, 13, { page: 'current' }).data().sum().toFixed({{$general_setting->decimal}}));
+            $( dt_selector.column( 14 ).footer() ).html(stock_worth_price.toFixed({{$general_setting->decimal}}) + ' / ' + stock_worth_cost.toFixed({{$general_setting->decimal}}));
+
+            $( dt_selector.column( 13 ).footer() ).html(dt_selector.cells( rows, 13, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
+
         }
         else {
-            $( dt_selector.column( 3 ).footer() ).html(dt_selector.column( 3, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
+            // $( dt_selector.column( 4 ).footer() ).html(dt_selector.column( 3, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 4 ).footer() ).html(dt_selector.column( 4, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 5 ).footer() ).html(dt_selector.column( 5, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
@@ -286,6 +315,14 @@
             $( dt_selector.column( 10 ).footer() ).html(dt_selector.column( 10, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 11 ).footer() ).html(dt_selector.column( 11, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 12 ).footer() ).html(dt_selector.column( 12, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
+
+            [stock_worth_price, stock_worth_cost] = stock_worth_price_cost_from_string(dt_selector.column(13, { page: 'current' }).data());
+
+            // $( dt_selector.column( 13 ).footer() ).html(dt_selector.column(13, { page: 'current' }).data().sum().toFixed({{$general_setting->decimal}}));
+            $( dt_selector.column( 14 ).footer() ).html(stock_worth_price.toFixed({{$general_setting->decimal}}) + ' / ' + stock_worth_cost.toFixed({{$general_setting->decimal}}));
+
+            $( dt_selector.column( 13 ).footer() ).html(dt_selector.column( 13, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
+
         }
     }
 </script>

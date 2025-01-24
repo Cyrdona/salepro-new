@@ -14,7 +14,7 @@
             font-size: 14px;
             line-height: 24px;
             font-family: 'Ubuntu', sans-serif;
-            text-transform: none;
+            text-transform: capitalize;
         }
         .btn {
             padding: 7px 10px;
@@ -56,7 +56,7 @@
 
         @media print {
             * {
-                font-size:13px;
+                font-size:12px;
                 line-height: 20px;
             }
             td,th {padding: 5px 0;}
@@ -95,11 +95,12 @@
     <div id="receipt-data">
         <div class="centered">
             @if($general_setting->site_logo)
-                <img src="{{url('logo', $general_setting->site_logo)}}" height="200" width="200" style="margin:1px 0;">
+                <img src="{{url('logo', $general_setting->site_logo)}}" height="42" width="50" style="margin:10px 0;">
             @endif
-            <h3>{{trans('file.name')}}: {{$lims_warehouse_data->name}}</h3>
-            <p>
-                <br>{{trans('file.Biller')}}: {{$lims_biller_data->name}}
+
+            <h2>{{$lims_biller_data->company_name}}</h2>
+
+            <p>{{trans('file.Address')}}: {{$lims_warehouse_data->address}}
                 <br>{{trans('file.Phone Number')}}: {{$lims_warehouse_data->phone}}
                 @if($general_setting->vat_registration_number)
                 <br>{{trans('file.VAT Number')}}: {{$general_setting->vat_registration_number}}
@@ -141,14 +142,38 @@
                     }
                     else
                         $product_name = $lims_product_data->name;
-
+                    // @dd($product_sale_data->imei_number);
                     if($product_sale_data->imei_number && !str_contains($product_sale_data->imei_number, "null") ) {
                         $product_name .= '<br>'.trans('IMEI or Serial Numbers').': '.$product_sale_data->imei_number;
                     }
+
+                    $topping_names = [];
+                    $topping_prices = [];
+                    $topping_price_sum = 0;
+            
+                    if ($product_sale_data->topping_id) {
+                        $decoded_topping_id = json_decode(json_decode($product_sale_data->topping_id), true);
+                        //dd(json_decode($product_sale_data->topping_id));
+                        if (is_array($decoded_topping_id)) {
+                            foreach ($decoded_topping_id as $topping) {
+                                $topping_names[] = $topping['name']; // Extract name
+                                $topping_prices[] = $topping['price']; // Extract price
+                                $topping_price_sum += $topping['price']; // Sum up prices
+                            }
+                        }
+                    }
+            
+                    $net_price_with_toppings = $product_sale_data->net_unit_price + $topping_price_sum;
+                    $subtotal = ($product_sale_data->total+ $topping_price_sum);
                 ?>
                 <tr>
                     <td colspan="2">
                         {!!$product_name!!}
+
+                        @if(!empty($topping_names))
+                            <br><small>({{ implode(', ', $topping_names) }})</small>
+                        @endif
+
                         @foreach($product_custom_fields as $index => $fieldName)
                             <?php $field_name = str_replace(" ", "_", strtolower($fieldName)) ?>
                             @if($lims_product_data->$field_name)
@@ -159,84 +184,88 @@
                                 @endif
                             @endif
                         @endforeach
-                        <br>{{$product_sale_data->qty}} x {{number_format((float)($product_sale_data->total / $product_sale_data->qty), $general_setting->decimal, '.')}}
+                        <br>{{$product_sale_data->qty}} x {{number_format((float)($product_sale_data->total / $product_sale_data->qty), $general_setting->decimal, '.', ',')}}
+
+                        @if(!empty($topping_prices))
+                            <small>+ {{ implode(' + ', array_map(fn($price) => number_format($price, $general_setting->decimal, '.', ','), $topping_prices)) }}</small>
+                        @endif
 
                         @if($product_sale_data->tax_rate)
                             <?php $total_product_tax += $product_sale_data->tax ?>
                             [{{trans('file.Tax')}} ({{$product_sale_data->tax_rate}}%): {{$product_sale_data->tax}}]
                         @endif
                     </td>
-                    <td style="text-align:right;vertical-align:bottom">{{number_format((float)($product_sale_data->total), $general_setting->decimal, '.')}}</td>
+                    <td style="text-align:right;vertical-align:bottom">{{number_format($subtotal, $general_setting->decimal, '.', ',')}}</td>
                 </tr>
                 @endforeach
 
             <!-- <tfoot> -->
                 <tr>
                     <th colspan="2" style="text-align:left">{{trans('file.Total')}}</th>
-                    <th style="text-align:right">{{number_format((float)($lims_sale_data->total_price), $general_setting->decimal, '.')}}</th>
+                    <th style="text-align:right">{{number_format((float)($lims_sale_data->total_price), $general_setting->decimal, '.', ',')}}</th>
                 </tr>
                 @if($general_setting->invoice_format == 'gst' && $general_setting->state == 1)
                 <tr>
                     <td colspan="2">IGST</td>
-                    <td style="text-align:right">{{number_format((float)($total_product_tax), $general_setting->decimal, '.')}}</td>
+                    <td style="text-align:right">{{number_format((float)($total_product_tax), $general_setting->decimal, '.', ',')}}</td>
                 </tr>
                 @elseif($general_setting->invoice_format == 'gst' && $general_setting->state == 2)
                 <tr>
                     <td colspan="2">SGST</td>
-                    <td style="text-align:right">{{number_format((float)($total_product_tax / 2), $general_setting->decimal, '.')}}</td>
+                    <td style="text-align:right">{{number_format((float)($total_product_tax / 2), $general_setting->decimal, '.', ',')}}</td>
                 </tr>
                 <tr>
                     <td colspan="2">CGST</td>
-                    <td style="text-align:right">{{number_format((float)($total_product_tax / 2), $general_setting->decimal, '.')}}</td>
+                    <td style="text-align:right">{{number_format((float)($total_product_tax / 2), $general_setting->decimal, '.', ',')}}</td>
                 </tr>
                 @endif
                 @if($lims_sale_data->order_tax)
                 <tr>
                     <th colspan="2" style="text-align:left">{{trans('file.Order Tax')}}</th>
-                    <th style="text-align:right">{{number_format((float)($lims_sale_data->order_tax), $general_setting->decimal, '.')}}</th>
+                    <th style="text-align:right">{{number_format((float)($lims_sale_data->order_tax), $general_setting->decimal, '.', ',')}}</th>
                 </tr>
                 @endif
                 @if($lims_sale_data->order_discount)
                 <tr>
                     <th colspan="2" style="text-align:left">{{trans('file.Order Discount')}}</th>
-                    <th style="text-align:right">{{number_format((float)($lims_sale_data->order_discount), $general_setting->decimal, '.')}}</th>
+                    <th style="text-align:right">{{number_format((float)($lims_sale_data->order_discount), $general_setting->decimal, '.', ',')}}</th>
                 </tr>
                 @endif
                 @if($lims_sale_data->coupon_discount)
                 <tr>
                     <th colspan="2" style="text-align:left">{{trans('file.Coupon Discount')}}</th>
-                    <th style="text-align:right">{{number_format((float)($lims_sale_data->coupon_discount), $general_setting->decimal, '.')}}</th>
+                    <th style="text-align:right">{{number_format((float)($lims_sale_data->coupon_discount), $general_setting->decimal, '.', ',')}}</th>
                 </tr>
                 @endif
                 @if($lims_sale_data->shipping_cost)
                 <tr>
                     <th colspan="2" style="text-align:left">{{trans('file.Shipping Cost')}}</th>
-                    <th style="text-align:right">{{number_format((float)($lims_sale_data->shipping_cost), $general_setting->decimal, '.')}}</th>
+                    <th style="text-align:right">{{number_format((float)($lims_sale_data->shipping_cost), $general_setting->decimal, '.', ',')}}</th>
                 </tr>
                 @endif
                 <tr>
                     <th colspan="2" style="text-align:left">{{trans('file.grand total')}}</th>
-                    <th style="text-align:right">{{number_format((float)($lims_sale_data->grand_total), $general_setting->decimal, '.')}}</th>
+                    <th style="text-align:right">{{number_format((float)($lims_sale_data->grand_total), $general_setting->decimal, '.', ',')}}</th>
                 </tr>
                 @if($lims_sale_data->grand_total - $lims_sale_data->paid_amount > 0)
                 <tr>
                     <th colspan="2" style="text-align:left">{{trans('file.Due')}}</th>
-                    <th style="text-align:right">{{number_format((float)($lims_sale_data->grand_total - $lims_sale_data->paid_amount), $general_setting->decimal, '.')}}</th>
+                    <th style="text-align:right">{{number_format((float)($lims_sale_data->grand_total - $lims_sale_data->paid_amount), $general_setting->decimal, '.', ',')}}</th>
                 </tr>
                 @endif
                 @if($totalDue)
                 <tr>
                     <th colspan="2" style="text-align:left">{{trans('file.Total Due')}}</th>
-                    <th style="text-align:right">{{number_format($totalDue, $general_setting->decimal, '.')}}</th>
+                    <th style="text-align:right">{{number_format($totalDue, $general_setting->decimal, '.', ',')}}</th>
                 </tr>
                 @endif
-                {{-- <tr>
+                <tr>
                     @if($general_setting->currency_position == 'prefix')
                     <th class="centered" colspan="3">{{trans('file.In Words')}}: <span>{{$currency_code}}</span> <span>{{str_replace("-"," ",$numberInWords)}}</span></th>
                     @else
                     <th class="centered" colspan="3">{{trans('file.In Words')}}: <span>{{str_replace("-"," ",$numberInWords)}}</span> <span>{{$currency_code}}</span></th>
                     @endif
-                </tr> --}}
+                </tr>
             </tbody>
             <!-- </tfoot> -->
         </table>
@@ -245,8 +274,8 @@
                 @foreach($lims_payment_data as $payment_data)
                 <tr style="background-color:#ddd;">
                     <td style="padding: 5px;width:30%">{{trans('file.Paid By')}}: {{$payment_data->paying_method}}</td>
-                    <td style="padding: 5px;width:40%">{{trans('file.Amount')}}: {{number_format((float)($payment_data->amount), $general_setting->decimal, '.')}}</td>
-                    <td style="padding: 5px;width:30%">{{trans('file.Change')}}: {{number_format((float)$payment_data->change, $general_setting->decimal, ',')}}</td>
+                    <td style="padding: 5px;width:40%">{{trans('file.Amount')}}: {{number_format((float)($payment_data->amount), $general_setting->decimal, '.', ',')}}</td>
+                    <td style="padding: 5px;width:30%">{{trans('file.Change')}}: {{number_format((float)$payment_data->change, $general_setting->decimal, '.', ',')}}</td>
                 </tr>
                 @endforeach
                 <tr><td class="centered" colspan="3">{{trans('file.Thank you for shopping with us. Please come again')}}</td></tr>

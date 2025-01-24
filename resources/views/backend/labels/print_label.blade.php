@@ -7,7 +7,7 @@
     <!-- <columns column-count="{{$barcode_details->stickers_in_one_row}}" column-gap="{{$barcode_details->col_distance*1}}"> -->
     @endif
     <td align="center" valign="center">
-        <div style="overflow: hidden !important;display: flex; flex-wrap: wrap;align-content: center;width: {{$barcode_details->width * 1}}in; height: {{$barcode_details->height * 1}}in; justify-content: center;">
+        <div style="overflow: hidden !important;display: flex; flex-wrap: wrap;align-content: center;width: {{$barcode_details->width * 1}}in; height: {{$barcode_details->height * 2}}in; justify-content: center;">
             <div>
 
                 {{-- Business Name --}}
@@ -19,6 +19,13 @@
                 @if(!empty($print['name']))
                     <span style="display: block !important; font-size: {{$print['name_size']}}px">
                         {{$page_product['product_actual_name']}}
+                    </span>
+                @endif
+
+                {{-- Brand Name --}}
+                @if(!empty($print['brand_name']))
+                    <span style="display: block !important; font-size: {{$print['brand_name_size']}}px">
+                        {{$page_product['brand_name']}}
                     </span>
                 @endif
 

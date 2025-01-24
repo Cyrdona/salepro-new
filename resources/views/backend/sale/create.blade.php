@@ -632,6 +632,7 @@
 @endsection
 
 @push('scripts')
+
 <script type="text/javascript">
 
     $("ul#sale").siblings('a').attr('aria-expanded','true');
@@ -735,6 +736,7 @@ var temp_unit_operation_value = [];
 
 var deposit = <?php echo json_encode($deposit) ?>;
 var points = <?php echo json_encode($points) ?>;
+
 @if($lims_reward_point_setting_data)
 var reward_point_setting = <?php echo json_encode($lims_reward_point_setting_data) ?>;
 @endif
@@ -788,7 +790,7 @@ function getProduct(warehouse_id){
             lims_product_array.push(product_code[index]+'|'+product_name[index]+'|'+imei_number[index]+'|'+is_embeded[index]);
         });
 
-        console.log(lims_product_array);
+        // console.log(lims_product_array);
 
         //updating in stock
         var rownumber = $('table.order-list tbody tr:last').index();
@@ -1023,6 +1025,7 @@ function productSearch(data) {
                 data: data
             },
             success: function(data) {
+                // console.log(data);
                 var flag = 1;
                 if (pre_qty > 0) {
                     var qty = data[15];
@@ -1628,19 +1631,21 @@ $(document).on('submit', '.payment-form', function(e) {
             type: $('.payment-form').attr('method'),
             data: $('.payment-form').serialize(),
             success: function(response) {
-                console.log(response);
+                // console.log(response);
 
                 if (response.payment_method === 'pesapal' && response.redirect_url) {
                     // Redirect to the URL returned for Pesapal payment method
                     location.href = response.redirect_url;
-                } else if ($('select[name="sale_status"]').val() == 1 && response !== 'pesapal') {
+                }else if(response.payment_method === 'moneipoint'){
+                    // console.log('ok');
+                }else if ($('select[name="sale_status"]').val() == 1 && response !== 'pesapal') {
                     let link = "{{url('sales/gen_invoice/')}}" + '/' + response;
                     $('#print-layout').load(link, function() {
                         setTimeout(function() {
                             window.print();
                         }, 50);
                     });
- 
+
                     $("#submit-button").prop('disabled', false);
                     $('#add-payment').modal('hide');
                     cancel($('table.order-list tbody tr:last').index());

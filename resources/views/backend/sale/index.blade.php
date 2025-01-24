@@ -668,11 +668,13 @@
 
     $(document).on("click", "tr.sale-link td:not(:first-child, :last-child)", function() {
         var sale = $(this).parent().data('sale');
+        // console.log(sale, '671');
         saleDetails(sale);
     });
 
     $(document).on("click", ".view", function(){
         var sale = $(this).parent().parent().parent().parent().parent().data('sale');
+        // console.log('Sale: '+ sale);
         saleDetails(sale);
     });
 
@@ -762,7 +764,7 @@
         rowindex = $(this).closest('tr').index();
         deposit = $('table.sale-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('.deposit').val();
         var sale_id = $(this).data('id').toString();
-        var balance = $('table.sale-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(12)').text();
+        var balance = $('table.sale-list tbody tr:nth-child(' + (rowindex + 1) + ')').find('td:nth-child(13)').text();
         balance = parseFloat(balance.replace(/,/g, ''));
         $('input[name="paying_amount"]').val(balance);
         $('#add-payment input[name="balance"]').val(balance);
@@ -1230,15 +1232,24 @@
     function saleDetails(sale){
         $("#sale-details input[name='sale_id']").val(sale[13]);
 
-        var htmltext = '<strong>{{trans("file.date")}}: </strong>'+sale[0]+'<br><strong>{{trans("file.reference")}}: </strong>'+sale[1]+'<br><strong>{{trans("file.Warehouse")}}: </strong>'+sale[27]+'<br><strong>{{trans("file.Sale Status")}}: </strong>'+sale[2]+'<br><strong>{{trans("file.Currency")}}: </strong>'+sale[31];
+        var htmltext = '<strong>{{trans("file.date")}}: </strong>'+sale[0]+
+            '<br><strong>{{trans("file.reference")}}: </strong>'+sale[1]+
+            '<br><strong>{{trans("file.Warehouse")}}: </strong>'+sale[27]+
+            '<br><strong>{{trans("file.Sale Status")}}: </strong>'+sale[2]+
+            '<br><strong>{{trans("file.Currency")}}: </strong>'+sale[31];
+
         if(sale[32])
             htmltext += '<br><strong>{{trans("file.Exchange Rate")}}: </strong>'+sale[32]+'<br>';
         else
             htmltext += '<br><strong>{{trans("file.Exchange Rate")}}: </strong>N/A<br>';
         if(sale[30])
             htmltext += '<strong>{{trans("file.Attach Document")}}: </strong><a href="documents/sale/'+sale[30]+'">Download</a><br>';
-        htmltext += '<br><div class="row"><div class="col-md-6"><strong>{{trans("file.From")}}:</strong><br>'+sale[3]+'<br>'+sale[4]+'<br>'+sale[5]+'<br>'+sale[6]+'<br>'+sale[7]+'<br>'+sale[8]+'</div><div class="col-md-6"><div class="float-right"><strong>{{trans("file.To")}}:</strong><br>'+sale[9]+'<br>'+sale[10]+'<br>'+sale[11]+'<br>'+sale[12]+'</div></div></div>';
+
+        htmltext += '<br><div class="row"><div class="col-md-6"><strong>{{trans("file.From")}}:</strong><br>'+sale[3]+'<br>'+sale[4]+'<br>'+sale[5]+'<br>'+sale[6]+'<br>'+sale[7]+'<br>'+sale[8]+
+        '</div><div class="col-md-6"><div class="float-right"><strong>{{trans("file.To")}}:</strong><br>'+sale[9]+'<br>'+sale[10]+'<br>'+sale[11]+'<br>'+sale[12]+'</div></div></div>';
+
         $.get('sales/product_sale/' + sale[13], function(data){
+            // console.log(data);
             $(".product-sale-list tbody").remove();
             var name_code = data[0];
             var qty = data[1];
@@ -1250,21 +1261,70 @@
             var batch_no = data[7];
             var return_qty = data[8];
             var is_delivered = data[9];
+            // Check if data[10] exists
+            var toppings = data[10] ? data[10] : []; 
             var total_qty = 0;
             var newBody = $("<tbody>");
-            $.each(name_code, function(index){
+
+            $.each(name_code, function(index) {
                 var newRow = $("<tr>");
                 var cols = '';
-                cols += '<td><strong>' + (index+1) + '</strong></td>';
-                cols += '<td>' + name_code[index] + '</td>';
+                cols += '<td><strong>' + (index + 1) + '</strong></td>';
+                cols += '<td>' + name_code[index];
+
+                // Append topping names if toppings[index] exists
+                if (toppings[index]) {
+                    try {
+                        // Parse and extract topping names
+                        var toppingData = JSON.parse(toppings[index]);
+                        var toppingNames = toppingData.map(topping => topping.name).join(', ');
+                        cols += ' (' + toppingNames + ')';
+                    } catch (error) {
+                        console.error('Error parsing toppings for index', index, toppings[index], error);
+                    }
+                }
+
+                cols += '</td>';
                 cols += '<td>' + batch_no[index] + '</td>';
                 cols += '<td>' + qty[index] + ' ' + unit_code[index] + '</td>';
                 cols += '<td>' + return_qty[index] + '</td>';
-                cols += '<td>' + parseFloat(subtotal[index] / qty[index]).toFixed({{$general_setting->decimal}}) + '</td>';
+
+                // Calculate unit price
+                var unitPrice = parseFloat(subtotal[index] / qty[index]).toFixed({{$general_setting->decimal}});
+
+                // Calculate topping prices if toppings[index] exists
+                var toppingPrices = '';
+                if (toppings[index]) {
+                    try {
+                        var toppingData = JSON.parse(toppings[index]); // Parse topping data
+                        toppingPrices = toppingData
+                            .map(topping => parseFloat(topping.price).toFixed({{$general_setting->decimal}})) // Extract and format each topping price
+                            .join(' + '); // Join prices with '+'
+                    } catch (error) {
+                        console.error('Error calculating topping prices for index', index, toppings[index], error);
+                    }
+                }
+
+                cols += '<td>' + unitPrice + ' (' + toppingPrices + ')</td>';
+
                 cols += '<td>' + tax[index] + '(' + tax_rate[index] + '%)' + '</td>';
                 cols += '<td>' + discount[index] + '</td>';
-                cols += '<td>' + subtotal[index] + '</td>';
+
+                // Update subtotal to include topping prices
+                var toppingPricesRowTotal = 0;
+                if (toppings[index]) {
+                    try {
+                        var toppingData = JSON.parse(toppings[index]);
+                        toppingPricesRowTotal = toppingData.reduce((sum, topping) => sum + parseFloat(topping.price), 0);
+                    } catch (error) {
+                        console.error('Error calculating topping prices for index', index, toppings[index], error);
+                    }
+                }
+                subtotal[index] = parseFloat(subtotal[index]) + toppingPricesRowTotal;
+                
+                cols += '<td>' + subtotal[index].toFixed({{$general_setting->decimal}}) + '</td>';
                 cols += '<td>' + is_delivered[index] + '</td>';
+
                 total_qty += parseFloat(qty[index]);
                 newRow.append(cols);
                 newBody.append(newRow);

@@ -1,15 +1,15 @@
 @extends('backend.layout.main')
 
-@if(in_array('ecommerce',explode(',',$general_setting->modules)))
+@if(in_array('ecommerce',explode(',',$general_setting->modules)) || in_array('restaurant',explode(',',$general_setting->modules)))
 @push('css')
 <style>
-.search_result {border:1px solid #e4e6fc;border-radius:5px;overflow-y: scroll;}
-.search_result > div, .selected_items > div {border-top:1px solid #e4e6fc;cursor:pointer;display:flex;align-items:center;padding: 10px;position: relative;}
-.search_result > div > img, .selected_items > div > img {margin-right: 10px;max-width: 40px;}
-.search_result > div h4, .selected_items > div h4 {font-size: 0.9rem;}
-.search_result > div i {color:#54b948;position:absolute;right:5px;top:30%}
-.search_result div:first-child {border-top:none}
-.selected_items .remove_item {position: absolute;right: 20px;top:20px};
+.search_result, .search_result_addon {border:1px solid #e4e6fc;border-radius:5px;overflow-y: scroll;}
+.search_result > div, .search_result_addon > div, .selected_items > div, .selected_addons > div {border-top:1px solid #e4e6fc;cursor:pointer;display:flex;align-items:center;padding: 10px;position: relative;}
+.search_result > div > img, .search_result_addon > div > img, .selected_items > div > img, .selected_addons > div > img {margin-right: 10px;max-width: 40px;}
+.search_result > div h4, .search_result_addon > div h4, .selected_items > div h4, .selected_addons > div h4 {font-size: 0.9rem;}
+.search_result > div i,  .search_result_addon > div i, {color:#54b948;position:absolute;right:5px;top:30%}
+.search_result div:first-child, .search_result_addon div:first-child, {border-top:none}
+.selected_items .remove_item, .selected_addons .remove_item {position: absolute;right: 20px;top:20px};
 .delVarOption{display: flex;flex-direction: column;align-items: center;}
 </style>
 @endpush
@@ -220,6 +220,13 @@
                                     </div>
                                     </div>
                                 </div>
+                                <!-- test  -->
+                                <!-- <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>{{trans('file.Date')}}</label>
+                                        <input type="date" name="abcd" class="form-control" placeholder="Choose date"/>
+                                    </div>
+                                </div> -->
 
                                 <div class="col-md-4">
                                     <div class="form-group">
@@ -230,6 +237,36 @@
                                         </select>
                                     </div>
                                 </div>
+
+                                <!-- Warranty and Guarantee [20-01-2025] -->
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>{{ trans('file.Warranty') }}</label>
+                                        <div class="d-flex justify-content-between">
+                                            <input type="number" name="warranty" min="1" class="form-control" style="width: 48%;" placeholder="eg: 1">
+                                            <select name="warranty_type" class="form-control selectpicker" style="width: 48%;">
+                                                <option value="days">Days</option>
+                                                <option value="months" selected>Months</option>
+                                                <option value="years">Years</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>{{ trans('file.Guarantee') }}</label>
+                                        <div class="d-flex justify-content-between">
+                                            <input type="number" name="guarantee" min="1" class="form-control" style="width: 48%;" placeholder="eg: 1">
+                                            <select name="guarantee_type" class="form-control selectpicker" style="width: 48%;">
+                                                <option value="days">Days</option>
+                                                <option value="months" selected>Months</option>
+                                                <option value="years">Years</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Warranty and Guarantee end -->
+
                                 @foreach($custom_fields as $field)
                                 @if(!$field->is_admin || \Auth::user()->role_id == 1)
                                     <div class="{{'col-md-'.$field->grid_value}}">
@@ -274,19 +311,12 @@
                                                     @endforeach
                                                 </select>
                                             @elseif($field->type == 'date_picker')
-                                                <input type="text" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control date" @if($field->is_required){{'required'}}@endif>
+                                                <input type="date" name="{{str_replace(' ', '_', strtolower($field->name))}}" value="{{$field->default_value}}" class="form-control" @if($field->is_required){{'required'}}@endif>
                                             @endif
                                         </div>
                                     </div>
                                 @endif
                             @endforeach
-                                <div class="col-md-4">
-                                    <div class="form-group mt-3">
-                                        <input type="checkbox" name="is_initial_stock" value="1">&nbsp;
-                                        <label>{{trans('file.Initial Stock')}}</label>
-                                        <p class="italic">{{trans('file.This feature will not work for product with variants and batches')}}</p>
-                                    </div>
-                                </div>
                                 <div class="col-md-4">
                                     <div class="form-group mt-3">
                                         <input type="checkbox" name="featured" value="1">&nbsp;
@@ -297,10 +327,18 @@
                                 <div class="col-md-4">
                                     <div class="form-group mt-3">
                                         <input type="checkbox" name="is_embeded" value="1">&nbsp;
-                                        <label>{{trans('file.Embedded Barcode')}} <i class="dripicons-question" data-toggle="tooltip" title="{{trans('file.Check this if this product will be used in weight scale machine.')}}"></i></label>
+                                        <label>{{trans('file.Embedded Barcode')}}</label>
+                                        <p class="italic">{{trans('file.Check this if this product will be used in weight scale machine.')}}</p>
                                     </div>
                                 </div>
-                                <div class="col-md-6" id="initial-stock-section">
+                                <div class="col-md-12">
+                                    <div class="form-group mt-3">
+                                        <input type="checkbox" name="is_initial_stock" value="1">&nbsp;
+                                        <label>{{trans('file.Initial Stock')}}</label>
+                                        <p class="italic">{{trans('file.This feature will not work for product with variants and batches')}}</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" id="initial-stock-section">
                                     <div class="table-responsive ml-2">
                                         <table class="table table-hover">
                                             <thead>
@@ -444,19 +482,28 @@
                                 </div>
                                 @endif
 
-                                @if(in_array('ecommerce',explode(',',$general_setting->modules)))
+                                @if(in_array('ecommerce',explode(',',$general_setting->modules)) || in_array('restaurant',explode(',',$general_setting->modules)))
                                 <div class="col-md-12 mt-3">
                                     <h5><input name="is_online" type="checkbox" id="is_online" value="1" checked>&nbsp; {{trans('file.Sell Online')}}</h5>
                                 </div>
+                                @endif
+
+                                @if(in_array('restaurant',explode(',',$general_setting->modules)))
+                                <div class="col-md-12 mt-3">
+                                    <h5><input name="is_addon" type="checkbox" id="is_addon" value="1">&nbsp; {{trans('file.This is topping')}} <i class="dripicons-question" data-toggle="tooltip" title="{{trans('file.Check this if the item is a topping or extra or add-on only to be served with a main course.')}}"></i></h5>
+                                </div>
+                                @endif
+
+                                @if(in_array('ecommerce',explode(',',$general_setting->modules)))
                                 <div class="col-md-12 mt-3">
                                     <h5><input name="in_stock" type="checkbox" id="in_stock" value="1" checked>&nbsp; {{trans('file.In Stock')}}</h5>
                                 </div>
-                                <div class="col-md-12 mt-3 track_inventory" style="display:none">
+                                <!-- <div class="col-md-12 mt-3 track_inventory" style="display:none">
                                     <h5><input name="track_inventory" type="checkbox" id="track_inventory" value="0">&nbsp; {{trans('file.Track Inventory')}}</h5>
-                                </div>
+                                </div> -->
                                 @endif
                             </div>
-                            @if(in_array('ecommerce',explode(',',$general_setting->modules)))
+                            @if(in_array('ecommerce',explode(',',$general_setting->modules)) || in_array('restaurant',explode(',',$general_setting->modules)))
                             <div class="row">
                                 <div class="col-12 mt-3">
                                     <div class="form-group">
@@ -478,13 +525,50 @@
                                     <label>{{ __('Meta Description') }} *</label>
                                     <input type="text" name="meta_description" class="form-control" value="">
                                 </div>
-                                <div class="col-md-12 form-group">
-                                    <label>{{trans('file.Products')}}</label>
+                                <div class="col-md-12 form-group related-section">
+                                    <label>{{trans('file.Related Products')}}</label>
                                     <input type="text" id="search_products" class="form-control">
                                     <div class="search_result"></div>
                                     <h4 class="mt-5 mb-3">Selected Items</h4>
                                     <div class="selected_items"></div>
                                     <textarea class="selected_ids hidden no-tiny" name="products"></textarea>
+                                </div>
+                            </div>
+                            @endif 
+
+                            @if(in_array('restaurant',explode(',',$general_setting->modules)))
+                            <div class="row">
+                                <div class="col-md-12 form-group extra-section">
+                                    <label>{{trans('file.Extras')}}</label>
+                                    <input type="text" id="search_addons" class="form-control">
+                                    <div class="search_result_addon"></div>
+                                    <h4 class="mt-5 mb-3">Selected Extras</h4>
+                                    <div class="selected_addons"></div>
+                                    <textarea class="selected_addon_ids hidden no-tiny" name="extras"></textarea>
+                                </div>
+                                <div class="col-md-4 col-6">
+                                    <div class="form-group top-fields">
+                                        <label>{{trans('file.Kitchen')}} *</label>
+                                        <div class="input-group pos">
+                                            <select required id="kitchen_id" name="kitchen_id" class="selectpicker form-control" title="Select kitchen...">
+                                                @foreach($kitchen_list as $kitchen)
+                                                <option value="{{$kitchen->id}}">{{$kitchen->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-6">
+                                    <div class="form-group top-fields">
+                                        <label>{{trans('file.Menu Type')}}</label>
+                                        <div class="input-group pos">
+                                            <select required id="menu_type" name="menu_type[]" class="selectpicker form-control" multiple>
+                                                @foreach($menu_type_list as $menu_type)
+                                                <option value="{{$menu_type->id}}">{{$menu_type->name}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             @endif
@@ -518,7 +602,7 @@
                     {{-- {{Form::file('image', array('class' => 'form-control'))}} --}}
                     <input type="file" name="image" class="form-control">
                 </div>
-                @if(in_array('ecommerce',explode(',',$general_setting->modules)))
+                @if(in_array('ecommerce',explode(',',$general_setting->modules)) || in_array('restaurant',explode(',',$general_setting->modules)))
                 <div class="row">
                     <div class="col-md-12 mt-3">
                         <h6><strong>{{ __('For SEO') }}</strong></h6>
@@ -584,16 +668,15 @@
         }
     });
 
-    $("#in_stock").on('click', function(){
-        if($("#in_stock").prop('checked') == false){
-            $('.track_inventory').css('display','block');
+    $("#is_addon").on('click', function(){
+        if($("#is_addon").prop('checked') == false){
+            $('.extra-section,.related-section').css('display','block');
         }else{
-            $('.track_inventory').css('display','none');
-            $("#track_inventory").prop('checked') == false
+            $('.extra-section,.related-section').css('display','none');
         }
     })
 
-    @if(in_array('ecommerce',explode(',',$general_setting->modules)))
+    @if(in_array('ecommerce',explode(',',$general_setting->modules)) || in_array('restaurant',explode(',',$general_setting->modules)))
     $('#search_products').on('input', function() {
         var item = $(this).val();
         $('.search_result').html('<div class="d-block text-center"><div class="spinner-border text-secondary" role="status"><span class="sr-only">Loading...</span></div></div>');
@@ -630,6 +713,47 @@
         var remove_id = $(this).parent().data('id');
         var selected_ids = $('.selected_ids').html().replace(remove_id+',','');
         $('.selected_ids').html(selected_ids);
+
+    });
+    @endif
+
+    @if(in_array('restaurant',explode(',',$general_setting->modules)))
+    $('#search_addons').on('input', function() {
+        var item = $(this).val();
+        $('.search_result_addon').html('<div class="d-block text-center"><div class="spinner-border text-secondary" role="status"><span class="sr-only">Loading...</span></div></div>');
+
+        if(item.length >= 3){
+            $.ajax({
+                type: "get",
+                url: "{{url('search')}}/" + item,
+                success: function(data) {
+                    $('.search_result_addon').html('').css('height','200px');
+                    $.each(data,function(key, value){
+                        var image = value.image.split(',');
+                        $('.search_result_addon').append('<div data-id="'+value.id+'"><img src="{{asset("images/product/small/")}}/'+image[0]+'"><h4>'+value.name+'</h4><i class="dripicons-checkmark d-none"></i></div>')
+                    })
+                }
+            })
+        } else if (item.length < 3) {
+            $('.search_result_addon').html('');
+        }
+    });
+
+    $(document).on('click','.search_result_addon div',function(){
+        $(this).find('i').removeClass('d-none');
+        var selected_addon = '<div data-id="'+$(this).data('id')+'">'+$(this).html()+'<span class="remove_item"><i class="dripicons-cross"></i></span></div>';
+        if ($('.selected_addon_ids').html().indexOf($(this).data('id')) === -1){
+            $('.selected_addons').prepend(selected_addon);
+            $('.selected_addon_ids').append($(this).data('id')+',');
+            $('.selected_addons .dripicons-checkmark').addClass('d-none');
+        }
+    });
+
+    $(document).on('click','.remove_item',function(){
+        var item = $(this).parent().remove();
+        var remove_addon_id = $(this).parent().data('id');
+        var selected_addon_ids = $('.selected_addon_ids').html().replace(remove_addon_id +',','');
+        $('.selected_addon_ids').html(selected_addon_ids);
 
     });
     @endif
@@ -1420,6 +1544,7 @@
     });
 
     function validate() {
+        // console.log('validate function: ' + 1516);
         var product_code = $("input[name='code']").val();
         var barcode_symbology = $('select[name="barcode_symbology"]').val();
         var exp = /^\d+$/;
@@ -1537,6 +1662,7 @@
                                 location.href = '../products';
                             },
                             error:function(response) {
+                                // console.log(response);
                               if(response.responseJSON.errors.name) {
                                   $("#name-error").text(response.responseJSON.errors.name);
                               }

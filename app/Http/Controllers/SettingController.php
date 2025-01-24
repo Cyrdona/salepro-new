@@ -721,8 +721,16 @@ class SettingController extends Controller
 
         $data = $request->all();
 
-        if(isset($data['options'])){
-            $options = implode(',',$data['options']);
+        // Check if 'options' is set and validate its uniqueness
+        if (isset($data['options'])) {
+            // Remove duplicates from the input array
+            $uniqueOptions = array_unique($data['options']);
+
+            if (count($uniqueOptions) !== count($data['options'])) {
+                return redirect()->back()->with('not_permitted', 'Payment options must be unique.');
+            }
+
+            $options = implode(',', $uniqueOptions);
         } else {
             $options = '"none"';
         }

@@ -7,7 +7,7 @@ use App\Product;
 use App\SellingPriceGroup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Cache;
+use Cache; 
 
 class LabelsController extends Controller
 {
@@ -27,14 +27,11 @@ class LabelsController extends Controller
 
     public function printLabel(Request $request)
     {
-
         try {
             $products = $request->get('products');
             $print = $request->get('print');
 
             $barcode_setting = $request->get('barcode_setting');
-
-            // return $products;
 
             $barcode_details = Barcode::find($barcode_setting);
             $barcode_details->stickers_in_one_sheet = $barcode_details->is_continuous ? $barcode_details->stickers_in_one_row : $barcode_details->stickers_in_one_sheet;
@@ -63,6 +60,7 @@ class LabelsController extends Controller
                 $details['currency'] = $value['currency'];
                 $details['currency_position'] = $value['currency_position'];
                 $details['product_id'] = $value['product_id'];
+                $details['brand_name'] = $value['brand_name'];
                 $details['product_type'] = 'standard';
                 $details['sub_sku'] = $value['sub_sku'];
                 $details['barcode_type'] = 'C128';
@@ -100,7 +98,6 @@ class LabelsController extends Controller
                 if ($i == $len - 1) {
                     $is_last = true;
                 }
-                // return $page_products;
                 $output = view('backend.labels.print_label')
                             ->with(compact('print', 'page_products', 'business_name', 'barcode_details', 'margin_top', 'margin_left', 'paper_width', 'paper_height', 'is_first', 'is_last', 'factor'))->render();
                 print_r($output);

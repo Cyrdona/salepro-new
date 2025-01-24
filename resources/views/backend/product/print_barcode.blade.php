@@ -72,6 +72,7 @@
                                                             <td><input type="hidden" name="products[{{$key}}][product_promo_price]" value="{{$preLoadedproduct[4]}}"></td>
                                                             <td><input type="hidden" name="products[{{$key}}][currency]" value="{{$preLoadedproduct[5]}}"></td>
                                                             <td><input type="hidden" name="products[{{$key}}][currency_position]" value="{{$preLoadedproduct[6]}}"></td>
+                                                            <td><input type="hidden" name="products[{{$key}}][brand_name]" value="{{$preLoadedproduct['11']}}"></td>
                                                         </tr>
                                                         @endforeach
                                                     </tbody>
@@ -112,6 +113,13 @@
                                             <div class="d-flex justify-content-start">
                                                 <div>Size:</div>&nbsp;
                                                 <div><input type="number" name="print[business_name_size]" value="15"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <strong><input type="checkbox" name="print[brand_name]" checked value="1" /> {{trans('file.Brand')}}</strong>
+                                            <div class="d-flex justify-content-start">
+                                                <div>Size:</div>&nbsp;
+                                                <div><input type="number" name="print[brand_name_size]" value="15"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -216,8 +224,9 @@
                 },
                 success: function(responseData) {
                     data = responseData[0];
-                    console.log(data);
                     var flag = 1;
+
+                    //console.log(data[11]);
 
                     $(".product-code").each(function() {
                         if ($(this).text() == data[1]) {
@@ -240,6 +249,7 @@
                         cols += '<td><input type="hidden" name="products['+ key +'][product_promo_price]" value="'+data[4]+'"></td>';
                         cols += '<td><input type="hidden" name="products['+ key +'][currency]" value="'+data[5]+'"></td>';
                         cols += '<td><input type="hidden" name="products['+ key +'][currency_position]" value="'+data[6]+'"></td>';
+                        cols += '<td><input type="hidden" name="products['+ key +'][brand_name]" value="'+data[11]+'"></td>';
 
 
                         newRow.append(cols);

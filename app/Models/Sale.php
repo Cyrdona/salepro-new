@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sale extends Model
 {
@@ -43,5 +44,10 @@ class Sale extends Model
     public function currency()
     {
         return $this->belongsTo('App\Models\Currency');
+    }
+
+    public function saleWarrantyGuarantees(): HasMany
+    {
+        return $this->hasMany(SaleWarrantyGuarantee::class);
     }
 }

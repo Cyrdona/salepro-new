@@ -18,16 +18,16 @@ class SaasInstallController extends Controller
 
     public function saasInstallStep1()
     {
-        return view('backend.saas.step_1');
+        return view('saas.step_1');
     }
 
     public function saasInstallStep2()
     {
-        return view('backend.saas.step_2');
+        return view('saas.step_2');
     }
     public function saasInstallStep3()
     {
-        return view('backend.saas.step_3');
+        return view('saas.step_3');
     }
 
     public function saasInstallProcess(SaasInstallationRequest $request)
@@ -214,6 +214,6 @@ class SaasInstallController extends Controller
 
     public function saasInstallStep4()
     {
-        return view('backend.saas.step_4');
+        return view('saas.step_4');
     }
 }

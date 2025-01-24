@@ -314,6 +314,15 @@ class ProductController extends Controller
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $numberOfProduct = Product::where('is_active', true)->count();
             $custom_fields = CustomField::where('belongs_to', 'product')->get();
+
+            $general_setting = DB::table('general_settings')->select('modules')->first();
+            if(in_array('restaurant',explode(',',$general_setting->modules))){
+                $kitchen_list = DB::table('kitchens')->where('is_active',1)->get();
+                $menu_type_list = DB::table('menu_type')->where('is_active',1)->get();
+
+                return view('backend.product.create',compact('kitchen_list','menu_type_list','lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_brand_list', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'custom_fields'));
+            }
+
             return view('backend.product.create',compact('lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_brand_list', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'custom_fields'));
         }
         else
@@ -322,7 +331,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        //return $request;
+        // return dd($request->all());
         $this->validate($request, [
             'code' => [
                 'max:255',
@@ -337,7 +346,19 @@ class ProductController extends Controller
                 }),
             ]
         ]);
+
         $data = $request->except('image', 'file');
+        
+        // handle warranty and guarantee
+        if (!isset($data['warranty'])) {
+            unset($data['warranty']);
+            unset($data['warranty_type']);
+        }
+        if (!isset($data['guarantee'])) {
+            unset($data['guarantee']);
+            unset($data['guarantee_type']);
+        }
+        // return dd($data);
 
         if(isset($data['is_variant'])) {
             $data['variant_option'] = json_encode(array_unique($data['variant_option']));
@@ -353,6 +374,10 @@ class ProductController extends Controller
             $data['slug'] = Str::slug($data['name'], '-');
             $data['slug'] = preg_replace('/[^A-Za-z0-9\-]/', '', $data['slug']);
             $data['slug'] = str_replace( '\/', '/', $data['slug'] );
+        }
+
+        if(in_array('restaurant', explode(',',config('addons')))) {
+            $data['menu_type'] = implode(",", $request->menu_type);
         }
 
         if($data['type'] == 'combo') {
@@ -396,7 +421,7 @@ class ProductController extends Controller
                 // Handle multi-tenant logic if necessary
                 if (!config('database.connections.saleprosaas_landlord')) {
                     $imageName = $imageName . '.' . $ext;
-                    
+
                 } else {
                     $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
                 }
@@ -437,7 +462,7 @@ class ProductController extends Controller
                 $data['is_sync_disable'] = null;
         //return $data;
         $lims_product_data = Product::create($data);
-        //inserting custom field data
+        
         $custom_field_data = [];
         $custom_fields = CustomField::where('belongs_to', 'product')->select('name', 'type')->get();
         foreach ($custom_fields as $type => $custom_field) {
@@ -1046,10 +1071,25 @@ class ProductController extends Controller
             $noOfVariantValue = 0;
             $custom_fields = CustomField::where('belongs_to', 'product')->get();
 
-            if(in_array('ecommerce', explode(',',config('addons')))) {
+            $general_setting = DB::table('general_settings')->select('modules')->first();
+            if(in_array('ecommerce', explode(',',$general_setting->modules))) {
                 $product_arr = explode(',',$lims_product_data->related_products);
                 $related_products = DB::table('products')->whereIn('id',$product_arr)->get();
                 return view('backend.product.edit',compact('related_products','lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_brand_list', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields'));
+            }
+
+            $general_setting = DB::table('general_settings')->select('modules')->first();
+            if(in_array('restaurant',explode(',',$general_setting->modules))){
+                $kitchen_list = DB::table('kitchens')->where('is_active',1)->get();
+                $menu_type_list = DB::table('menu_type')->where('is_active',1)->get();
+
+                $product_arr = explode(',',$lims_product_data->related_products);
+                $related_products = DB::table('products')->whereIn('id',$product_arr)->get();
+
+                $extra_arr = explode(',',$lims_product_data->extras);
+                $extras = DB::table('products')->whereIn('id',$extra_arr)->get();
+
+                return view('backend.product.edit',compact('kitchen_list','menu_type_list','related_products','extras','lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_brand_list', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields'));
             }
             return view('backend.product.edit',compact('lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_brand_list', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields'));
         }
@@ -1084,7 +1124,8 @@ class ProductController extends Controller
             $data['name'] = htmlspecialchars(trim($data['name']), ENT_QUOTES);
 
 
-            if(in_array('ecommerce', explode(',',config('addons')))) {
+            $general_setting = DB::table('general_settings')->select('modules')->first();
+            if(in_array('ecommerce', explode(',',$general_setting->modules))) {
                 $data['slug'] = Str::slug($data['name'], '-');
                 $data['slug'] = preg_replace('/[^A-Za-z0-9\-]/', '', $data['slug']);
                 $data['slug'] = str_replace( '\/', '/', $data['slug'] );
@@ -1100,6 +1141,28 @@ class ProductController extends Controller
                 else
                     $data['is_online'] = 0;
             }
+
+            if(in_array('restaurant', explode(',',$general_setting->modules))) {
+                $data['slug'] = Str::slug($data['name'], '-');
+                $data['slug'] = preg_replace('/[^A-Za-z0-9\-]/', '', $data['slug']);
+                $data['slug'] = str_replace( '\/', '/', $data['slug'] );
+                $data['related_products'] = rtrim($request->products, ",");
+                $data['extras'] = rtrim($request->extras, ",");
+
+                if(isset($request->is_online))
+                    $data['is_online'] = $request->input('is_online');
+                else
+                    $data['is_online'] = 0;
+
+                if(isset($request->is_addon))
+                    $data['is_addon'] = $request->input('is_addon');
+                else
+                    $data['is_addon'] = 0;
+
+                $data['kitchen_id'] = $request->kitchen_id;
+                $data['menu_type'] = implode(",", $request->menu_type);
+            }
+
 
             if($data['type'] == 'combo') {
                 $data['product_list'] = implode(",", $data['product_id']);
@@ -1128,7 +1191,7 @@ class ProductController extends Controller
 
             if(!isset($data['is_sync_disable']) && \Schema::hasColumn('products', 'is_sync_disable'))
                 $data['is_sync_disable'] = null;
-            
+
             if(isset($data['short_description']))
                 $data['short_description'] = $data['short_description'];
             $data['product_details'] = str_replace('"', '@', $data['product_details']);
@@ -1293,6 +1356,15 @@ class ProductController extends Controller
                     }
                 }
             }
+            // handle warranty and guarantee
+            if (!isset($data['warranty'])) {
+                $data['warranty'] = null;
+                $data['warranty_type'] = null;
+            }
+            if (!isset($data['guarantee'])) {
+                $data['guarantee'] = null;
+                $data['guarantee_type'] = null;
+            }
             $lims_product_data->update($data);
             //inserting data for custom fields
             $custom_field_data = [];
@@ -1397,10 +1469,33 @@ class ProductController extends Controller
             $batch[] = $batch_no;
             $expired_date[] = $expiredDate;
             $qty[] = $product_warehouse_data->qty;
-            if($product_warehouse_data->imei_number && !str_contains($product_warehouse_data->imei_number, 'null'))
-                $imei_number[] = $product_warehouse_data->imei_number;
-            else
-                $imei_number[] = 'N/A';
+
+            $imeis = Product_Warehouse::select('imei_number')
+                ->where('product_id', $lims_product_data->id)
+                ->where('warehouse_id', $product_warehouse_data->warehouse_id)
+                ->whereNotNull('imei_number')
+                ->get();
+          
+            if($product_warehouse_data->imei_number && !str_contains($product_warehouse_data->imei_number, 'null')) {
+                $imei_number[$key] = $product_warehouse_data->imei_number;
+            }
+
+            foreach ($imeis as $imei) {
+                if (isset($imei->imei_number)){
+                    $imei_number[$key] = isset($imei_number[$key]) ?  $imei_number[$key] . ',' . $imei->imei_number : $imei->imei_number;
+                }
+            }
+            if (!isset($imei_number[$key])) {
+                $imei_number[$key] = 'N/A';
+            }
+        }
+
+        // remove duplication in imei_numbers
+        if (isset($imei_number)) {
+            for ($i = 0; $i < count($imei_number); $i++) {
+                $temp = array_unique(explode(',', $imei_number[$i]));
+                $imei_number[$i] = implode(',', $temp);
+            }
         }
 
         $product_warehouse = [$warehouse, $qty, $batch, $expired_date, $imei_number];
@@ -1410,10 +1505,8 @@ class ProductController extends Controller
 
     public function printBarcode(Request $request)
     {
-        //return $request;
         if($request->input('data')) {
             $preLoadedproducts = $this->limsProductSearch($request);
-            //return $this->limsProductSearch($request);
         }
         else
             $preLoadedproducts = [];
@@ -1464,7 +1557,6 @@ class ProductController extends Controller
                 ->where('product_variants.product_id', $lims_product_list[0]->id)
                 ->get();
         }
-        //return $lims_product_list;
         foreach($lims_product_list as $lims_product_data) {
             $product = [];
             $product[] = $lims_product_data->name;
@@ -1479,6 +1571,9 @@ class ProductController extends Controller
                 $additional_price = 0;
             }
 
+            // adding brand name
+            $brand = Brand::find($lims_product_data->brand_id);
+
             $product[] = $lims_product_data->price + $additional_price;
             $product[] = DNS1D::getBarcodePNG($product[1], $lims_product_data->barcode_symbology);
             $product[] = $lims_product_data->promotion_price;
@@ -1488,6 +1583,8 @@ class ProductController extends Controller
             $product[] = $lims_product_data->id;
             $product[] = $variant_id;
             $product[] = $lims_product_data->cost;
+            $product[] = $brand->title;
+
             $products[] = $product;
         }
         return $products;

@@ -19,6 +19,7 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
+    <!-- <script type="text/javascript" src="{{ asset('js/barcode-qrcode-scanner_plugin.js') }}"></script> -->
     @else
     <!-- Styles -->
     <link href="{{ asset('../../css/app.css') }}" rel="stylesheet">

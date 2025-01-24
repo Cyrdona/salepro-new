@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\TransferDetails;
-use Illuminate\Http\Request;
-use App\Models\Warehouse;
-use App\Models\Product;
-use App\Models\Product_Warehouse;
+use DB;
+use Auth;
 use App\Models\Tax;
 use App\Models\Unit;
+use App\Models\Product;
 use App\Models\Transfer;
-use App\Models\ProductTransfer;
-use App\Models\ProductVariant;
-use App\Models\ProductBatch;
+use App\Models\Warehouse;
 use App\Models\MailSetting;
-use Auth;
-use DB;
-use Illuminate\Support\Facades\Mail;
+use App\Models\ProductBatch;
+use Illuminate\Http\Request;
+use App\Mail\TransferDetails;
+use App\Models\ProductVariant;
+use App\Models\ProductPurchase;
+use App\Models\ProductTransfer;
+use App\Models\Product_Warehouse;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Mail;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Validator;
 
@@ -59,6 +60,45 @@ class TransferController extends Controller
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+    }
+
+    private function findImeis(string $product_id, string $variant_id = '0')
+    {
+        $imei_numbers = [];
+        $purchases = [];
+        if ($variant_id === '0') {
+            $purchases = ProductPurchase::where('product_id', $product_id)
+                ->whereNotNull('imei_number')
+                ->select('imei_number')->get();
+        } else {
+            $purchases = ProductPurchase::where('product_id', $product_id)
+                ->where('variant_id', '=', $variant_id)
+                ->whereNotNull('imei_number')
+                ->select('imei_number')->get();
+        }
+        
+        foreach ($purchases as $purchase) {
+            $imei_numbers[] = explode(',', $purchase->imei_number);
+        }
+        $imeis = [];
+        foreach ($imei_numbers as $imei_number) {
+            foreach ($imei_number as $imei) {
+                $imeis[] = $imei;
+            }
+        }
+
+        $convert_to_string = '';
+        foreach ($imeis as $key => $value) {
+            $convert_to_string .= $value;
+            if (count($imeis)-1 > $key) {
+                $convert_to_string .= ',';
+            }
+        }
+
+        if (!count($imeis)) {
+            return 'N/A';
+        }
+        return $convert_to_string;
     }
 
     public function transferData(Request $request)
@@ -215,6 +255,7 @@ class TransferController extends Controller
                 $data[] = $nestedData;
             }
         }
+        // return dd($data);
         $json_data = array(
             "draw"            => intval($request->input('draw')),
             "recordsTotal"    => intval($totalData),
@@ -657,7 +698,7 @@ class TransferController extends Controller
 
     public function store(Request $request)
     {
-
+        // return dd($request->all());
         $data = $request->except('document');
 
         //return dd($data);
@@ -872,8 +913,15 @@ class TransferController extends Controller
                 $product->code = $lims_product_variant_data->item_code;
             }
             $product_transfer[0][$key] = $product->name . ' [' . $product->code. ']';
-            if($product_transfer_data->imei_number)
-                $product_transfer[0][$key] .= '<br>IMEI or Serial Number: ' . $product_transfer_data->imei_number;
+            
+            $product_id = $product_transfer_data->product_id;
+            $variant_id = $product_transfer_data->variant_id ?? 0;
+            $imeis = $this->findImeis($product_id, $variant_id);
+            if ($imeis != 'N/A') {
+                $product_transfer[0][$key] .= '<br>IMEI or Serial Number: ' . $imeis;
+
+            }
+
             $product_transfer[1][$key] = $product_transfer_data->qty;
             $product_transfer[2][$key] = $unit->unit_code;
             $product_transfer[3][$key] = $product_transfer_data->tax;

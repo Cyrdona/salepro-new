@@ -1,8 +1,7 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Tenant;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -198,6 +197,23 @@ class ExternalServicesSeeder extends Seeder
                 'name' => 'Pesapal',
                 'type' => 'payment',
                 'details' => 'Mode,Consumer Key,Consumer Secret;sandbox,qkio1BGGYAXTu2JOfm7XSXNruoZsrqEW,osGQ364R49cXKeOYSpaOnT++rHs=', // Dummy values; users will update
+                'module_status' => json_encode(['ecommerce' => true, 'salepro' => true]),
+                'active' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // Add a new gateway if needed
+        $newGateway = DB::table('external_services')
+            ->where('name', 'Moneipoint') // Replace with the actual name
+            ->first();
+
+        if (!$newGateway) {
+            DB::table('external_services')->insert([
+                'name' => 'Moneipoint',
+                'type' => 'payment',
+                'details' => 'Mode,client_id,client_secret,terminal_serial;sandbox,api-client-3956952-7e1279e2-95d2-45e1-825a-3a28e0a35168,ZtH02Q%jQ$Imcf%W^B%q,C42P008D01909830', // Dummy values; users will update
                 'module_status' => json_encode(['ecommerce' => true, 'salepro' => true]),
                 'active' => 1,
                 'created_at' => now(),

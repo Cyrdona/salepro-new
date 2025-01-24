@@ -9,6 +9,7 @@ use App\Models\Payment;
 use App\Models\Returns;
 use App\Models\ReturnPurchase;
 use App\Models\Expense;
+use App\Models\Income;
 use App\Models\Payroll;
 use App\Models\MoneyTransfer;
 use DB;
@@ -131,7 +132,7 @@ class AccountsController extends Controller
     public function accountStatement(Request $request)
     {
         $data = $request->all();
-        //return $data;
+
         $lims_account_data = Account::find($data['account_id']);
         $credit_list = new Collection;
         $debit_list = new Collection;
@@ -173,6 +174,11 @@ class AccountsController extends Controller
                             ->whereDate('created_at', '<=' , $data['end_date'])
                             ->select('reference_no', 'amount', 'created_at')
                             ->get();
+            $income_list = Income::where('account_id', $data['account_id'])
+                            ->whereDate('created_at', '>=' , $data['start_date'])
+                            ->whereDate('created_at', '<=' , $data['end_date'])
+                            ->select('reference_no', 'amount', 'created_at')
+                            ->get();
             $return_list = Returns::where('account_id', $data['account_id'])
                             ->whereDate('created_at', '>=' , $data['start_date'])
                             ->whereDate('created_at', '<=' , $data['end_date'])
@@ -193,6 +199,7 @@ class AccountsController extends Controller
         $all_transaction_list = $credit_list->concat($recieved_money_transfer_list)
                                 ->concat($debit_list)
                                 ->concat($expense_list)
+                                ->concat($income_list)
                                 ->concat($return_list)
                                 ->concat($purchase_return_list)
                                 ->concat($payroll_list)
@@ -219,14 +226,14 @@ class AccountsController extends Controller
     public function accountsAll()
     {
         $lims_account_list = DB::table('accounts')->where('is_active', true)->get();
-        
+
         $html = '';
         foreach($lims_account_list as $account){
             if($account->is_default == 1){
                 $html .='<option selected value="'.$account->id.'">'.$account->name . ' (' . $account->account_no. ')'.'</option>';
             }else{
                 $html .='<option value="'.$account->id.'">'.$account->name . ' (' . $account->account_no. ')'.'</option>';
-            }      
+            }
         }
 
         return response()->json($html);

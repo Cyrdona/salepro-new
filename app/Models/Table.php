@@ -9,5 +9,5 @@ class Table extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'number_of_person', 'description', 'is_active'];
+    protected $fillable = ['name', 'number_of_person', 'description', 'floor_id', 'is_active'];
 }

@@ -179,13 +179,13 @@
   <!-- Side Navbar -->
   <nav class="side-navbar shrink d-print-none">
     <span class="brand-big">
+      <a href="{{url('/dashboard')}}">
       @if($general_setting->site_logo)
-      <a href="{{url('/')}}"><img src="{{url('logo', $general_setting->site_logo)}}" width="115"></a>
+      <img src="{{url('logo', $general_setting->site_logo)}}" width="115">
       @else
-      <a href="{{url('/')}}">
-        <h1 class="d-inline">{{$general_setting->site_title}}</h1>
-      </a>
+        <h1 class="d-inline">{{$general_setting->site_title}}</h1>      
       @endif
+      </a>
     </span>
     @include('backend.layout.sidebar')
   </nav>
@@ -295,7 +295,7 @@
 
           ?>
           @if($sale_add_permission_active)
-          <li class="nav-item"><a class="btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> PDV </span></a></li>
+          <li class="nav-item"><a class="btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> POS</span></a></li>
           @endif
           <li class="nav-item d-none d-lg-block"><a id="switch-theme" data-toggle="tooltip" title="{{trans('file.Switch Theme')}}"><i class="dripicons-brightness-max"></i></a></li>
           @if(config('database.connections.saleprosaas_landlord'))
@@ -409,7 +409,7 @@
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-12">
-            <p>&copy; {{$general_setting->site_title}} | {{trans('file.Developed')}} {{trans('file.By')}} <span class="external">{{$general_setting->developed_by}}</span></p>
+            <p>&copy; {{$general_setting->site_title}} | {{trans('file.Developed')}} {{trans('file.By')}} <span class="external">{{$general_setting->developed_by}}</span> | V {{env('VERSION')}}</p>
           </div>
         </div>
       </div>
@@ -1156,6 +1156,9 @@
   <script type="text/javascript" src="https://cdn.datatables.net/fixedheader/3.1.6/js/dataTables.fixedHeader.min.js"></script>
   <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
   <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
+
+  <script type="text/javascript" src="{{ asset('js/barcode-qrcode-scanner_plugin.js') }}"></script>
+  
   @endif
   @endif
   @stack('scripts')
@@ -1207,7 +1210,7 @@
       document.getElementById("content").style.display = "block";
     }
 
-    $("div.alert").delay(4000).slideUp(30000);
+    $("div.alert").delay(4000);
 
     function confirmDelete() {
       if (confirm("Are you sure want to delete?")) {

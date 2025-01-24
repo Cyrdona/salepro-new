@@ -145,10 +145,34 @@
                         if($product_sale_data->imei_number && !str_contains($product_sale_data->imei_number, "null") ) {
                             $product_name .= '<br>'.trans('IMEI or Serial Numbers').': '.$product_sale_data->imei_number;
                         }
+
+                        $topping_names = [];
+                        $topping_prices = [];
+                        $topping_price_sum = 0;
+                
+                        if ($product_sale_data->topping_id) {
+                            $decoded_topping_id = json_decode(json_decode($product_sale_data->topping_id), true);
+                            //dd(json_decode($product_sale_data->topping_id));
+                            if (is_array($decoded_topping_id)) {
+                                foreach ($decoded_topping_id as $topping) {
+                                    $topping_names[] = $topping['name']; // Extract name
+                                    $topping_prices[] = $topping['price']; // Extract price
+                                    $topping_price_sum += $topping['price']; // Sum up prices
+                                }
+                            }
+                        }
+                
+                        $net_price_with_toppings = $product_sale_data->net_unit_price + $topping_price_sum;
+                        $subtotal = ($product_sale_data->total+ $topping_price_sum);
                     ?>
                     <tr>
                         <td colspan="2" style="width:60%">
                             {!!$product_name!!}
+
+                            @if(!empty($topping_names))
+                                <br><small>({{ implode(', ', $topping_names) }})</small>
+                            @endif
+
                             @foreach($product_custom_fields as $index => $fieldName)
                                 <?php $field_name = str_replace(" ", "_", strtolower($fieldName)) ?>
                                 @if($lims_product_data->$field_name)
@@ -161,12 +185,16 @@
                             @endforeach
                             <br>{{$product_sale_data->qty}} x {{number_format((float)($product_sale_data->total / $product_sale_data->qty), $general_setting->decimal, '.', ',')}}
 
+                            @if(!empty($topping_prices))
+                                <small>+ {{ implode(' + ', array_map(fn($price) => number_format($price, $general_setting->decimal, '.', ','), $topping_prices)) }}</small>
+                            @endif
+
                             @if($product_sale_data->tax_rate)
                                 <?php $total_product_tax += $product_sale_data->tax ?>
                                 [{{trans('file.Tax')}} ({{$product_sale_data->tax_rate}}%): {{$product_sale_data->tax}}]
                             @endif
                         </td>
-                        <td style="vertical-align:bottom;width:40%">{{number_format((float)($product_sale_data->total), $general_setting->decimal, '.', ',')}}</td>
+                        <td style="vertical-align:bottom;width:40%">{{number_format($subtotal, $general_setting->decimal, '.', ',')}}</td>
                     </tr>
                     @endforeach
 

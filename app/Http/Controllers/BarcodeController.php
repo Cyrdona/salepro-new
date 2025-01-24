@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Barcode;
-use DB;
+use DB; 
 
 class BarcodeController extends Controller
 {

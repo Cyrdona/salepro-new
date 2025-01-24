@@ -98,7 +98,7 @@
             </ul>
             </li>
             @endif
-            @if (in_array('manufacturing',explode(',',$general_setting->modules)))
+            @if(in_array('manufacturing',explode(',',$general_setting->modules)) && $role->id <= 2)
             <li>
                 <a href="#manufacturing" aria-expanded="false" data-toggle="collapse"> <i class="fa fa-industry"></i><span>{{trans('file.Manufacturing')}}</span></a>
                 <ul id="manufacturing" class="collapse list-unstyled ">
@@ -530,6 +530,9 @@
                     </ul>
                 </li>
                 @endif
+                @if(in_array('restaurant',explode(',',$general_setting->modules)))
+                    @include('restaurant::backend.layout.sidebar-menu')
+                @endif
             @endif
             <li><a href="#setting" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-gear"></i><span>{{trans('file.settings')}}</span></a>
                 <ul id="setting" class="collapse list-unstyled ">
@@ -598,7 +601,9 @@
                     @if($warehouse_permission_active)
                     <li id="warehouse-menu"><a href="{{route('warehouse.index')}}">{{trans('file.Warehouse')}}</a></li>
                     @endif
+                    @if($role->id <= 2)
                     <li id="table-menu"><a href="{{route('tables.index')}}">{{trans('file.Tables')}}</a></li>
+                    @endif
                     @if($customer_group_permission_active)
                     <li id="customer-group-menu"><a href="{{route('customer_group.index')}}">{{trans('file.Customer Group')}}</a></li>
                     @endif
@@ -633,15 +638,19 @@
                     @if($sms_setting_permission_active)
                     <li id="sms-setting-menu"><a href="{{route('setting.sms')}}">{{trans('file.SMS Setting')}}</a></li>
                     @endif
+                    @if($role->id <= 2)
                     <li id="payment-gateway-setting-menu"><a href="{{route('setting.gateway')}}">{{trans('file.Payment Gateways')}}</a></li>
+                    @endif
                     @if($pos_setting_permission_active)
-                    <li id="pos-setting-menu"><a href="{{route('setting.pos')}}">PDV {{trans('file.settings')}}</a></li>
+                    <li id="pos-setting-menu"><a href="{{route('setting.pos')}}">POS {{trans('file.settings')}}</a></li>
                     @endif
                     @if($hrm_setting_permission_active)
                     <li id="hrm-setting-menu"><a href="{{route('setting.hrm')}}"> {{trans('file.HRM Setting')}}</a></li>
                     @endif
                     <li id="barcode-setting-menu"><a href="{{route('barcodes.index')}}"> {{trans('file.Barcode Settings')}}</a></li>
+                    @if($role->id <= 2)
                     <li id="languages"><a href="{{url('languages/')}}"> {{trans('file.Languages')}}</a></li>
+                    @endif
                 </ul>
             </li>
         </ul>

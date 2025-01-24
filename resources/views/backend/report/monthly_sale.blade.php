@@ -24,20 +24,20 @@
 						    </tr>
 						</thead>
 					    <tbody>
-                            <tr>
-                                <td><strong>Janvier</strong></td>
-                                <td><strong>Février</strong></td>
-                                <td><strong>Mars</strong></td>
-                                <td><strong>Avril</strong></td>
-                                <td><strong>Mai</strong></td>
-                                <td><strong>Juin</strong></td>
-                                <td><strong>Juillet</strong></td>
-                                <td><strong>Août</strong></td>
-                                <td><strong>Septembre</strong></td>
-                                <td><strong>Octobre</strong></td>
-                                <td><strong>Novembre</strong></td>
-                                <td><strong>Décembre</strong></td>
-                            </tr>
+						    <tr>
+						      <td><strong>January</strong></td>
+						      <td><strong>February</strong></td>
+						      <td><strong>March</strong></td>
+						      <td><strong>April</strong></td>
+						      <td><strong>May</strong></td>
+						      <td><strong>June</strong></td>
+						      <td><strong>July</strong></td>
+						      <td><strong>August</strong></td>
+						      <td><strong>September</strong></td>
+						      <td><strong>October</strong></td>
+						      <td><strong>November</strong></td>
+						      <td><strong>December</strong></td>
+						    </tr>
 						    <tr>
 						    	@foreach($total_discount as $key => $discount)
 						        <td>

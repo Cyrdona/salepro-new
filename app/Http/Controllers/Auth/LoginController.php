@@ -21,7 +21,7 @@ class LoginController extends Controller
 
 
 
-    protected $redirectTo = '/dashboard';
+    protected $redirectTo = null;
 
     /**
 
@@ -59,19 +59,17 @@ class LoginController extends Controller
             return DB::table('general_settings')->latest()->first();
         });
 
-        if(!$general_setting) {
-            \DB::unprepared(file_get_contents(public_path('tenant_necessary.sql')));
-            $general_setting =  Cache::remember('general_setting', 60*60*24*365, function () {
-                return DB::table('general_settings')->latest()->first();
-            });
-            copy(public_path("landlord/images/logo/").$general_setting->site_logo, "logo/".$general_setting->site_logo);
-        }
         $numberOfUserAccount = \App\Models\User::where('is_active', true)->count();
         return view('backend.auth.login', compact('theme', 'general_setting', 'numberOfUserAccount'));
     }
 
     public function login(Request $request)
     {
+        ///////////////////////
+        if (!env('USER_VERIFIED') && $request->has('demo_type')) {
+            session(['database' => $request->query('demo_type')]);
+        }
+        ///////////////////////
 
         $input = $request->all();
 
@@ -85,10 +83,20 @@ class LoginController extends Controller
         if(auth()->attempt(array($fieldType => $input['name'], 'password' => $input['password'])))
         {
             setcookie('login_now', 1, time() + (86400 * 1), "/");
-            return redirect('/dashboard');
+            //return redirect('/dashboard');
+            return redirect()->intended('/dashboard');
         }
         else {
             return redirect()->route('login')->with('error','Username And Password Are Wrong.');
         }
+    }
+
+    public function logout(Request $request)
+    {
+        auth()->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login'); // Replace with your desired URL
     }
 }

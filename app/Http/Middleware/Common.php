@@ -16,9 +16,11 @@ class Common
 
     public function handle(Request $request, Closure $next)
     {
-        /*if( (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) {
-            URL::forceScheme('https');
-        }*/
+        if (!env('USER_VERIFIED') && session()->has('database')) {
+            \Config::set('database.connections.mysql.database', session('database'));
+            DB::purge('mysql');
+        }
+
         //get general setting value
         $general_setting =  Cache::remember('general_setting', 60*60*24*365, function () {
             return DB::table('general_settings')->latest()->first();

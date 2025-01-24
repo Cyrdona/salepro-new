@@ -78,6 +78,8 @@
             <button type="submit" class="btn btn-info staff-btn">LogIn as Staff</button>
             <button type="submit" class="btn btn-dark customer-btn">LogIn as Customer</button>
             <br><br>
+            <a href="?demo_type=salepro_m" class="btn btn-dark demo-btn">manufacturing</a>
+                        <br><br>
             @endif
             <a href="{{ route('password.request') }}" class="forgot-pass">{{trans('file.Forgot Password?')}}</a>
             <p class="register-section">{{trans('file.Do not have an account?')}}</p>
@@ -131,6 +133,16 @@
         $("input[name='name']").focus().val('admin');
         $("input[name='password']").focus().val('admin');
     });
+
+    $('.demo-btn').on('click', function(e) {
+        e.preventDefault();
+        $("input[name='name']").focus().val('admin');
+        $("input[name='password']").focus().val('admin');
+        let form = $('#login-form');
+        form.attr('action', $(this).attr('href'));
+        form.submit();
+    });
+
     
     if ('serviceWorker' in navigator ) {
         window.addEventListener('load', function() {

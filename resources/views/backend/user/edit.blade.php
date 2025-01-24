@@ -47,7 +47,7 @@
                                         <label><strong>{{trans('file.Phone Number')}} *</strong></label>
                                         <input type="text" name="phone" required class="form-control" value="{{$lims_user_data->phone}}">
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group d-inline-block">
                                         @if($lims_user_data->is_active)
                                         <input class="mt-2" type="checkbox" name="is_active" value="1" checked>
                                         @else
@@ -55,6 +55,16 @@
                                         @endif
                                         <label class="mt-2"><strong>{{trans('file.Active')}}</strong></label>
                                     </div>
+                                    @if(in_array('restaurant',explode(',',$general_setting->modules)))
+                                    <div class="form-group d-inline-block ml-2">
+                                        @if($lims_user_data->is_active)
+                                        <input class="mt-2" type="checkbox" name="service_staff" value="1" checked>
+                                        @else
+                                        <input class="mt-2" type="checkbox" name="service_staff" value="1">
+                                        @endif
+                                        <label class="mt-2"><strong>{{trans('file.Waiter')}}</strong></label>
+                                    </div>
+                                    @endif
                                     <div class="form-group">
                                         <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
                                     </div>

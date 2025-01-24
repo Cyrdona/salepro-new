@@ -195,6 +195,14 @@
                                         @endif
                                         <label class="mt-2">Pesapal</label>
                                     </div>
+                                    {{-- <div class="form-group d-inline">
+                                        @if(in_array("moneipoint",$options))
+                                        <input class="mt-2" type="checkbox" name="options[]" value="moneipoint" checked>
+                                        @else
+                                        <input class="mt-2" type="checkbox" name="options[]" value="moneipoint">
+                                        @endif
+                                        <label class="mt-2">Moneipoint</label>
+                                    </div> --}}
                                 </div>
                             </div>
                             <div class="form-inline row mt-3">
@@ -202,6 +210,9 @@
                                      <button type="button" class="btn btn-info add-more">+ {{trans('file.Add More Payment Option')}}</button>
                                 </div>
                             </div>
+                            @if (session('duplicate_message'))
+                                <p class="alert alert-danger">{{ session('duplicate_message') }}</p>
+                            @endif
                             <div class="row mt-2">
                                 <div class="form-inline col-md-4 form-group mt-2" id="payment-options">
                                     @foreach($options as $option)

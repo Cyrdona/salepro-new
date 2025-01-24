@@ -25,6 +25,7 @@ use Auth;
 use App\Models\User;
 use App\Models\ProductVariant;
 use App\Models\ProductBatch;
+use App\Models\Variant;
 use App\Traits\StaffAccess;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -433,21 +434,22 @@ class PurchaseController extends Controller
         $product[] = $lims_product_data->id;
         $product[] = $lims_product_data->is_batch;
         $product[] = $lims_product_data->is_imei;
+        // return dd($product);
         return $product;
     }
 
     public function store(Request $request)
     {
         $data = $request->except('document');
-        //return dd($data);
         $data['user_id'] = Auth::id();
-
+        
         if(!isset($data['reference_no']))
         {
             $data['reference_no'] = 'pr-' . date("Ymd") . '-'. date("his");
         }
-
+        
         $document = $request->document;
+        // return dd($data);
         if ($document) {
             $v = Validator::make(
                 [
@@ -479,8 +481,9 @@ class PurchaseController extends Controller
         }
         else
             $data['created_at'] = date("Y-m-d H:i:s");
-        //return dd($data);
+        // return dd($data);
         $lims_purchase_data = Purchase::create($data);
+        // return $lims_purchase_data;
         //inserting data for custom fields
         $custom_field_data = [];
         $custom_fields = CustomField::where('belongs_to', 'purchase')->select('name', 'type')->get();
@@ -555,6 +558,14 @@ class PurchaseController extends Controller
                 //add quantity to product variant table
                 $lims_product_variant_data->qty += $quantity;
                 $lims_product_variant_data->save();
+
+                // Update product name with variant
+                // if (strpos($lims_product_data->name, ")")) {
+                //     continue;
+                // }
+                // $variant = Variant::where('id', $lims_product_variant_data->variant_id)->select('name')->first();
+                // $lims_product_data->name = $lims_product_data->name . '(' . $variant->name . ')';
+                // $lims_product_data->save();
             }
             else {
                 $product_purchase['variant_id'] = null;
