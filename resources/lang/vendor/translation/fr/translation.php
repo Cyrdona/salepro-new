@@ -1,12 +1,12 @@
 <?php
 
 return [
-    'add' => '+ Ajouter',
+    'add' => 'Ajt',
     'add_language' => 'Ajouter une nouvelle langue',
     'add_translation' => 'Ajouter une traduction',
     'advanced_options' => 'Afficher les options avancées',
-    'file' => 'Fichier',
-    'group' => 'Groupe',
+    'file' => 'fichier',
+    'group' => 'groupe',
     'group_label' => 'Groupe (Optionnel)',
     'group_placeholder' => 'Ex: validation',
     'group_single' => 'Groupe / Unique',
@@ -15,7 +15,7 @@ return [
     'key_placeholder' => 'Par exemple : invalid_key',
     'keys_synced' => 'Clés manquantes synchronisées avec succès 🎊',
     'language' => 'Langue',
-    'language_added' => 'Nouvelle langue ajoutée avec succés 🙌',
+    'language_added' => 'Nouvelle langue ajoutée avec succès 🙌',
     'language_exists' => 'Le :attribute existe déjà.',
     'language_key_added' => 'Nouvelle clé dans la langue ajoutée avec succès 👏',
     'language_name' => 'Nom',

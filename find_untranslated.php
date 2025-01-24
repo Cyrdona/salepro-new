@@ -60,7 +60,7 @@ function flattenArrayKeys(array $array, string $prefix = ''): array {
 
 // Paths
 $viewPath = __DIR__ . '/resources/views';
-$langFilePath = __DIR__ . '/resources/lang/en/file.php';
+$langFilePath = __DIR__ . '/resources/lang/fr/file.php';
 
 // Run the script
 findUntranslatedStrings($viewPath, $langFilePath);
